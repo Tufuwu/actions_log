@@ -1,43 +1,35 @@
 name: CI
 
-on:
-  push:
-    branches: [ master, main ]
-  pull_request:
-    branches: [ master, main ]
+on: [push, pull_request]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
+  build:
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [node]
+        node-version: [0.12.x, 4.x, 5.x]
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: Set core.autocrlf on windows
+      if: matrix.os == 'windows-latest'
+      run: git config --global core.autocrlf true
 
-    - name: Setup Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Install global dependencies
-      run: |
-        npm install -g codecov
-        
-    - name: Install project dependencies
-      run: |
-        npm install boolbase nth-check htmlparser2
-        npm install tape tap-spec istanbul
+    - name: Install dependencies
+      run: npm install
 
-    - name: Run tests with coverage
-      run: npm run coverage
+    - name: Set debug on windows
+      if: matrix.os == 'windows-latest'
+      run: set DEBUG=*
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false
+    - run: npm test
