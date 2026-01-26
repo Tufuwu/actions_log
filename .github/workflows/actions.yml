@@ -1,34 +1,29 @@
-name: CI
+name: GitHub CI
+
 on:
   push:
-    branches: master
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
+
 jobs:
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm test
-      - name: Coveralls Parallel
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.github_token }}
-          flag-name: run-${{ matrix.node_version }}
-          parallel: true
-  finish:
-    needs: test
+    name: General checks, tests and build
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@master
+
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js LTS 18
+      uses: actions/setup-node@v3.5.1
       with:
-        github-token: ${{ secrets.github_token }}
-        parallel-finished: true
+        node-version: node
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Perform checks and tests
+      run: npm test
+
+    - name: Perform self-contained build
+      run: npm run build
