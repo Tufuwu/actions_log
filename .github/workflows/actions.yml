@@ -1,27 +1,31 @@
-name: CI
-on: [push, pull_request]
-permissions:
-  contents: read
+# This workflow will do a clean install of node dependencies, cache/restore them, run tests across different versions of node
+
+name: Test library
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   test:
+    runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        node: [14, 16, 18]
-    name: Test
-    runs-on: ${{ matrix.os }}
+        node-version: [16.x, node]
 
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        name: Use Node.js ${{ matrix.node-version }}
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install
-        run: npm ci
-
-      - name: Test
-        run: npm run test
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    # Tests do not run on built code by now, needs to be fixed
+    # - run: npm run build --if-present
+    - run: npm test
+    
+    # TODO: test on Deno
