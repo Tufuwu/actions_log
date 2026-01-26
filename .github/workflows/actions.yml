@@ -1,35 +1,23 @@
-name: CI
-
-on: [push, pull_request]
+name: Test diff match patch
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [0.12.x, 4.x, 5.x]
-        os: [ubuntu-latest]
-
-    runs-on: ${{ matrix.os }}
-
+  test:
+    runs-on: ubuntu-latest
     steps:
-    - name: Set core.autocrlf on windows
-      if: matrix.os == 'windows-latest'
-      run: git config --global core.autocrlf true
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Install
+        run: npm ci
 
-    - name: Install dependencies
-      run: npm install
-
-    - name: Set debug on windows
-      if: matrix.os == 'windows-latest'
-      run: set DEBUG=*
-
-    - run: npm test
+      - name: Run tests
+        run: npm test
