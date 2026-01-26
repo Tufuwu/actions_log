@@ -1,31 +1,30 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, run tests across different versions of node
-
-name: Test library
+name: CI
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - main
+      - master
+  pull_request: {}
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
+    name: "Tests"
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x, node]
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    # Tests do not run on built code by now, needs to be fixed
-    # - run: npm run build --if-present
-    - run: npm test
-    
-    # TODO: test on Deno
+      - uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 10.x
+          cache: yarn
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run Tests
+        run: yarn test
