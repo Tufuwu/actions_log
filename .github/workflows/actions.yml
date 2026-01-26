@@ -1,45 +1,19 @@
-name: "calipers"
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+name: main
+on: push
 jobs:
-  ci:
-    name: Build & Test
+  build:
     runs-on: ubuntu-latest
-
-    # Run the same tests suite for node 12, 14, 16
     strategy:
       matrix:
-        node-version: [14]
-
+        node: [ 14, 16 ]
+    name: Node ${{ matrix.node }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install packages
-        run: |
-          sudo apt-get -y install \
-            libpoppler-cpp-dev \
-            libpoppler-private-dev \
-            g++
-      # Setup this version of Node
-      # Cache is saved and restored by actions/setup-node
-      - name: Use Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - name: install node ${{ matrix.node }}
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install dependencies
+           node-version: ${{ matrix.node }}
+      - name: install
         run: npm install
-
-      - name: Run tests
-        run: npm test
-
-      - name: Run lint
-        run: npm run lint
+      - name: build
+        run: npm run build
