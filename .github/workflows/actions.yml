@@ -8,21 +8,23 @@ on:
 
 jobs:
   test:
-    name: Test on Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: ["node", "lts/*", "20", "19", "18", "17", "16", "15", "14", "13", "12", "11", "10", "8"]
-      fail-fast: false
+        node-version: [node, 11, 10, 8]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Run Tests
-        run: node test/test
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run tests
+        run: yarn test
