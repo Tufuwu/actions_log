@@ -1,4 +1,4 @@
-name: CI
+name: Tests
 
 on:
   push:
@@ -8,26 +8,20 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        # TODO: Include 22 and 23 when https://github.com/yeoman/yeoman-welcome/issues/7 is fixed
-        node: [8, 10, node]
-
+    runs-on: ubuntu-latest
+    name: 'Yoast SEO for Neos CMS frontend build'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node }}
+          node-version: '16'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: npm install
+        run: yarn
 
-      - name: Run tests
-        run: npm test
+      - name: Build inspector view plugin
+        run: yarn build:inspectorView
+
+      - name: Build edit/preview mode
+        run: yarn build:editMode
