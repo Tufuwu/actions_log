@@ -1,245 +1,129 @@
-<div align="center">
-  <br/>
-  <a href="http://pm2.keymetrics.io/" title="PM2 Keymetrics link">
-    <img width=710px src="https://raw.githubusercontent.com/Unitech/pm2/master/pres/pm2-v4.png" alt="pm2 logo">
-  </a>
-  <br/>
-<br/>
-<b>P</b>(rocess) <b>M</b>(anager) <b>2</b><br/>
-  <i>Runtime Edition</i>
-<br/><br/>
+![React JSX Highcharts](https://user-images.githubusercontent.com/2003804/40681848-2d0f5ce2-6382-11e8-8ce9-cd49c409ad2e.png)
 
+[![Build Status](https://travis-ci.com/whawker/react-jsx-highcharts.svg?branch=master)](https://travis-ci.com/whawker/react-jsx-highcharts)
 
-<a title="PM2 Downloads">
-  <img src="https://img.shields.io/npm/dm/pm2" alt="Downloads per Month"/>
-</a>
+[Highcharts](https://github.com/highcharts/highcharts) built with **proper React components**. More that just a simple wrapper - utilises the power of React props to create dynamic charts!
 
-<a title="PM2 Downloads">
-  <img src="https://img.shields.io/npm/dy/pm2" alt="Downloads per Year"/>
-</a>
+React JSX Highcharts offers separate packages for each Highcharts product.
 
-<a href="https://badge.fury.io/js/pm2" title="NPM Version Badge">
-   <img src="https://badge.fury.io/js/pm2.svg" alt="npm version">
-</a>
+##### [Highcharts](/packages/react-jsx-highcharts)
 
-<a href="https://travis-ci.com/github/Unitech/pm2" title="PM2 Tests">
-  <img src="https://travis-ci.org/Unitech/pm2.svg?branch=master" alt="Build Status"/>
-</a>
+##### [Highstock](/packages/react-jsx-highstock)
 
-<br/>
-<br/>
-<br/>
-</div>
+##### [Highmaps](/packages/react-jsx-highmaps)
 
+## Why React JSX Highcharts?
 
-PM2 is a production process manager for Node.js applications with a built-in load balancer. It allows you to keep applications alive forever, to reload them without downtime and to facilitate common system admin tasks.
+Unlike other React Highcharts wrapper libraries, **React JSX Highcharts** is designed to be dynamic - it is optimised for _interactive_ charts that need to adapt to business logic in your React application.
 
-Starting an application in production mode is as easy as:
+Other Highcharts wrappers completely destroy and recreate the chart when the configuration options change, which is _very_ wasteful and inefficient.
 
-```bash
-$ pm2 start app.js
+React JSX Highcharts uses a different approach. By providing React components for each Highcharts component, we can observe exactly which prop has changed and call the optimal Highcharts method behind the scenes. For example, if the `data` prop were to change on a `<Series />` component, React JSX Highcharts can follow Highcharts best practices and use the `setData` method rather than the more expensive `update`.
+
+React JSX Highcharts also enables you to write your _own_ Highcharts components, via its exposed hooks.
+
+## Installation
+
+```sh
+# Install the appropriate React JSX package
+npm install --save react-jsx-highcharts
+#               or react-jsx-highstock
+#               or react-jsx-highmaps
+
+# And the peer dependencies
+npm install --save react react-dom prop-types highcharts@^9.0.0
 ```
 
-PM2 is constantly assailed by [more than 1800 tests](https://app.travis-ci.com/github/Unitech/pm2/branches).
+## Licensing
 
-Official website: [https://pm2.keymetrics.io/](https://pm2.keymetrics.io/)
+React JSX Highcharts is free to use, however **Highcharts** itself requires a license for **commercial** use. [Highcharts license FAQs](https://shop.highsoft.com/faq).
 
-Works on Linux (stable) & macOS (stable) & Windows (stable). All Node.js versions are supported starting Node.js 12.X.
+## [Documentation](https://github.com/whawker/react-jsx-highcharts/wiki)
 
+## [Examples](https://codesandbox.io/s/github/whawker/react-jsx-highcharts-examples)
 
-### Installing PM2
+## Getting started
 
-With NPM:
+The intention of this library is to provide a very thin abstraction of Highcharts using React components. This has been achieved by passing Highcharts configuration options as component props.
 
-```bash
-$ npm install pm2 -g
+In the vast majority of cases, the name of the configuration option, and the name of the component prop are the same.
+
+#### Example
+
+`<Tooltip />` component
+
+```jsx
+<Tooltip padding={10} hideDelay={250} shape="square" split />
 ```
 
-You can install Node.js easily with [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) or [ASDF](https://blog.natterstefan.me/how-to-use-multiple-node-version-with-asdf).
+This corresponds to the Highcharts' [`tooltip`](http://api.highcharts.com/highcharts/tooltip) configuration of
 
-### Start an application
-
-You can start any application (Node.js, Python, Ruby, binaries in $PATH...) like that:
-
-```bash
-$ pm2 start app.js
+```js
+tooltip: {
+  enabled: true, // This is assumed when component is mounted
+  padding: 10,
+  hideDelay: 250,
+  shape: 'square',
+  split: true
+}
 ```
 
-Your app is now daemonized, monitored and kept alive forever.
+We aim to pass all configuration options using the same name, so we use [Highcharts' documentation](http://api.highcharts.com/highcharts) to figure out how to achieve the same with React JSX Highcharts.
 
-### Managing Applications
+### Note:
 
-Once applications are started you can manage them easily:
+There are **two** exceptions to the above;
 
-![Process listing](https://github.com/Unitech/pm2/raw/master/pres/pm2-ls-v2.png)
+#### Exception 1
 
-To list all running applications:
+Where Highcharts **events** are concerned - instead of passing `events` as an object, we use the React convention _onEventName_.
 
-```bash
-$ pm2 list
+#### Example
+
+```jsx
+<SplineSeries
+  id="my-series"
+  data={myData}
+  onHide={this.handleHide}
+  onShow={this.handleShow}
+/>
 ```
 
-Managing apps is straightforward:
+This would correspond to the Highcharts configuration
 
-```bash
-$ pm2 stop     <app_name|namespace|id|'all'|json_conf>
-$ pm2 restart  <app_name|namespace|id|'all'|json_conf>
-$ pm2 delete   <app_name|namespace|id|'all'|json_conf>
+```js
+series: [
+  {
+    type: 'spline',
+    id: 'my-series',
+    data: myData,
+    events: { hide: this.handleHide, show: this.handleShow }
+  }
+];
 ```
 
-To have more details on a specific application:
+#### Exception 2
 
-```bash
-$ pm2 describe <id|app_name>
+`text` configuration options are passed as a React child
+
+#### Example
+
+```jsx
+<Title>Some Text Here</Title>
 ```
 
-To monitor logs, custom metrics, application information:
+This would correspond to the Highcharts configuration
 
-```bash
-$ pm2 monit
+```js
+title: {
+  text: 'Some Text Here';
+}
 ```
 
-[More about Process Management](https://pm2.keymetrics.io/docs/usage/process-management/)
+## Acknowledgements
 
-### Cluster Mode: Node.js Load Balancing & Zero Downtime Reload
+Thanks to [Recharts](https://github.com/recharts/recharts) for the inspiration of building charts with separate components.
 
-The Cluster mode is a special mode when starting a Node.js application, it starts multiple processes and load-balance HTTP/TCP/UDP queries between them. This increase overall performance (by a factor of x10 on 16 cores machines) and reliability (faster socket re-balancing in case of unhandled errors).
+Thanks to Highcharts themselves, obviously.
 
-![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/cluster.png)
-
-Starting a Node.js application in cluster mode that will leverage all CPUs available:
-
-```bash
-$ pm2 start api.js -i <processes>
-```
-
-`<processes>` can be `'max'`, `-1` (all cpu minus 1) or a specified number of instances to start.
-
-**Zero Downtime Reload**
-
-Hot Reload allows to update an application without any downtime:
-
-```bash
-$ pm2 reload all
-```
-
-[More informations about how PM2 make clustering easy](https://pm2.keymetrics.io/docs/usage/cluster-mode/)
-
-### Container Support
-
-With the drop-in replacement command for `node`, called `pm2-runtime`, run your Node.js application in a hardened production environment.
-Using it is seamless:
-
-```
-RUN npm install pm2 -g
-CMD [ "pm2-runtime", "npm", "--", "start" ]
-```
-
-[Read More about the dedicated integration](https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/)
-
-### Host monitoring speedbar
-
-PM2 allows to monitor your host/server vitals with a monitoring speedbar.
-
-To enable host monitoring:
-
-```bash
-$ pm2 set pm2:sysmonit true
-$ pm2 update
-```
-
-![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/vitals.png)
-
-### Terminal Based Monitoring
-
-![Monit](https://github.com/Unitech/pm2/raw/master/pres/pm2-monit.png)
-
-Monitor all processes launched straight from the command line:
-
-```bash
-$ pm2 monit
-```
-
-### Log Management
-
-To consult logs just type the command:
-
-```bash
-$ pm2 logs
-```
-
-Standard, Raw, JSON and formated output are available.
-
-Examples:
-
-```bash
-$ pm2 logs APP-NAME       # Display APP-NAME logs
-$ pm2 logs --json         # JSON output
-$ pm2 logs --format       # Formated output
-
-$ pm2 flush               # Flush all logs
-$ pm2 reloadLogs          # Reload all logs
-```
-
-To enable log rotation install the following module
-
-```bash
-$ pm2 install pm2-logrotate
-```
-
-[More about log management](https://pm2.keymetrics.io/docs/usage/log-management/)
-
-### Startup Scripts Generation
-
-PM2 can generate and configure a Startup Script to keep PM2 and your processes alive at every server restart.
-
-Init Systems Supported: **systemd**, **upstart**, **launchd**, **rc.d**
-
-```bash
-# Generate Startup Script
-$ pm2 startup
-
-# Freeze your process list across server restart
-$ pm2 save
-
-# Remove Startup Script
-$ pm2 unstartup
-```
-
-[More about Startup Scripts Generation](https://pm2.keymetrics.io/docs/usage/startup/)
-
-### Updating PM2
-
-```bash
-# Install latest PM2 version
-$ npm install pm2@latest -g
-# Save process list, exit old PM2 & restore all processes
-$ pm2 update
-```
-
-*PM2 updates are seamless*
-
-## PM2+ Monitoring
-
-If you manage your apps with PM2, PM2+ makes it easy to monitor and manage apps across servers.
-
-![https://app.pm2.io/](https://pm2.io/img/app-overview.png)
-
-Feel free to try it:
-
-[Discover the monitoring dashboard for PM2](https://app.pm2.io/)
-
-Thanks in advance and we hope that you like PM2!
-
-## CHANGELOG
-
-[CHANGELOG](https://github.com/Unitech/PM2/blob/master/CHANGELOG.md)
-
-## Contributors
-
-[Contributors](http://pm2.keymetrics.io/hall-of-fame/)
-
-## License
-
-PM2 is made available under the terms of the GNU Affero General Public License 3.0 (AGPL 3.0).
-For other licenses [contact us](mailto:contact@keymetrics.io).
+Thanks to @anajavi for all the help and support in maintaining this project.
