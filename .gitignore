@@ -1,23 +1,10 @@
-# Binaries
-*.pyc
-.tox/
-.env/
-venv/
-.cache/
-~/
-build/
-dist/
-*.egg-info/
-.eggs/
-docs/_build/doctrees/
-
-# IDE related
+logs
+*.log
+npm-debug.log*
+node_modules/
 .idea/
-
-# tests
-junit-result.xml
-htmlcov/
-.coverage
-__pycache__/
-.pytest_cache/
-README.html
+*.code-workspace
+.nyc_output/
+coverage/
+coverage.lcov
+*.iml
