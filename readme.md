@@ -1,208 +1,334 @@
-# Pa11y Dashboard
+# react-cytoscapejs
 
-Pa11y Dashboard is a web interface to the [Pa11y][pa11y] accessibility reporter; allowing you to focus on *fixing* issues rather than hunting them down.
+The `react-cytoscapejs` package is an MIT-licensed [React](https://reactjs.org) component for network (or graph, as in [graph theory](https://en.wikipedia.org/wiki/Graph_theory)) visualisation. The component renders a [Cytoscape](http://js.cytoscape.org) graph.
 
-![Version][shield-version]
-[![Node.js version support][shield-node]][info-node]
-[![Build status][shield-build]][info-build]
-[![GPL-3.0 licensed][shield-license]][info-license]
+Most props of this component are [Cytoscape JSON](http://js.cytoscape.org/#core/initialisation).
 
-![dashboard](https://user-images.githubusercontent.com/6110968/61603347-0bce1000-abf2-11e9-87b2-a53f91d315bb.jpg)
-![results-page](https://user-images.githubusercontent.com/6110968/62183438-05851580-b30f-11e9-9bc4-b6a4823ae9e8.jpg)
+## Usage
 
----
+### npm
 
-## Requirements
-
-Pa11y Dashboard is a [Node.js][node] application and requires a stable or LTS version of Node, currently version 12 or 14.
-
-⚠️ At the moment, Pa11y Dashboard won't work with Node.js v16. Please use Node.js 12 or 14. ⚠️
-
-Pa11y Dashboard uses a [MongoDB][mongo] database to store the results of the tests. The database doesn't have to be in the same server or computer where Pa11y Dashboard is running from.
-
-Pa11y Dashboard uses [puppeteer](https://www.npmjs.com/package/puppeteer) to create a headless instance of the Chromium browser in order to run the tests. On certain environments this may require additional dependencies to be installed. For example, in Debian/Ubuntu systems you may need to install the `libnss3` and `libgconf-2-4` libraries in order to be able to run tests on Pa11y Dashboard. Please refer to the documentation from your provider for details on how to do this.
-
-## Setting up Pa11y Dashboard
-
-In order to run Pa11y Dashboard, we recommend cloning this repository locally:
-
-```sh
-git clone https://github.com/pa11y/pa11y-dashboard.git
+```bash
+npm install react-cytoscapejs
+npm install cytoscape@3.x.y # your desired version, 3.2.19 or newer
 ```
 
-Then installing the dependencies:
+### yarn
 
-```sh
-cd pa11y-dashboard
-npm install
+```bash
+yarn add react-cytoscapejs
+yarn add cytoscape@3.x.y # your desired version, 3.2.19 or newer
 ```
 
-### Installing MongoDB
+Note that you must specify the desired version of `cytoscape` to be used.  Otherwise, you will get whatever version npm or yarn thinks best matches this package's compatible semver range -- which is currently `^3.2.19` or any version of 3 newer than or equal to 3.2.19.
 
-Instructions for installing and running MongoDB are outside the scope of this document. When in doubt, please refer to the [MongoDB installation instructions](https://docs.mongodb.com/manual/installation/) for details of how to install and run MongoDB on your specific operating system. An example of the installation and configuration process for macOS follows.
 
-Pa11y Dashboard currently uses version 3 of the Node.js MongoDB driver, which means that [only MongoDB servers of versions 4.4 or older are supported](https://docs.mongodb.com/drivers/node/current/compatibility/#mongodb-compatibility). Please ensure that your MongoDB server fills the requirements before trying to run Pa11y Dashboard.
+The component is created by putting a `<CytoscapeComponent>` within the `render()` function of one of your apps's React components. Here is a minimal example:
 
-#### Example MongoDB installation for macOS
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import CytoscapeComponent from 'react-cytoscapejs';
 
-On recent versions of macOS (10.13 or later), you can use [Homebrew](https://brew.sh/) to install MongoDB Community Edition. More recent versions of MongoDB are untested and unsupported.
+class MyApp extends React.Component {
+  constructor(props){
+    super(props);
+  }
 
-Tap the MongoDB Homebrew Tap:
+  render(){
+    const elements = [
+       { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+       { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } },
+       { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
+    ];
 
-```sh
-brew tap mongodb/brew
+    return <CytoscapeComponent elements={elements} style={ { width: '600px', height: '600px' } } />;
+  }
+}
+
+ReactDOM.render( React.createElement(MyApp, document.getElementById('root')));
 ```
 
-Install a supported Community version of MongoDB:
+## `Basic props`
 
-```sh
-brew install mongodb-community@4.4
+### `elements`
+
+The flat list of [Cytoscape elements](http://js.cytoscape.org/#notation/elements-json) to be included in the graph, each represented as non-stringified JSON. E.g.:
+
+```jsx
+<CytoscapeComponent
+  elements={[
+    { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+    { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } },
+    {
+      data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' }
+    }
+  ]}
+/>
 ```
 
-Start the MongoDB server:
+Note that arrays or objects should not be used in an `element`'s `data` or `scratch` fields, unless using a custom `diff()` prop.
 
-```sh
-brew services start mongodb/brew/mongodb-community@4.4
+In order to make it easier to support passing in `elements` JSON in the `elements: { nodes: [], edges: [] }` format, there is a static function `CytoscapeComponent.normalizeElements()`.  E.g.:
+
+```jsx
+<CytoscapeComponent
+  elements={CytoscapeComponent.normalizeElements({
+    nodes: [
+      { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+      { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } }
+    ],
+    edges: [
+      {
+        data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' }
+      }
+    ]
+  })}
+/>
 ```
 
-Check that the service has started properly:
+Note that `CytoscapeComponent.normalizeElements()` is useful only for plain-JSON data, such as an export from Cytoscape.js or the Cytoscape desktop software.  If you use [custom prop types](#custom-prop-types), such as Immutable, then you should flatten the elements yourself before passing the `elements` prop.
 
-```sh
-$ brew services list
-Name              Status  User       Plist
-mongodb-community started pa11y      /Users/pa11y/Library/LaunchAgents/homebrew.mxcl.mongodb-community.plist
+### `stylesheet`
+
+The Cytoscape stylesheet as non-stringified JSON. Note that the prop key is `stylesheet` rather than `style`, the key used by Cytoscape itself, so as to not conflict with the HTML [`style`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/style) attribute. E.g.:
+
+```jsx
+<CytoscapeComponent
+  stylesheet={[
+    {
+      selector: 'node',
+      style: {
+        width: 20,
+        height: 20,
+        shape: 'rectangle'
+      }
+    },
+    {
+      selector: 'edge',
+      style: {
+        width: 15
+      }
+    }
+  ]}
+/>
 ```
 
-### Configuring Pa11y Dashboard
+### `layout`
 
-The last step before being able to run Pa11y Dashboard is to define a configuration for it. This can be done in two ways:
+Use a [layout](http://js.cytoscape.org/#layouts) to automatically position the nodes in the graph. E.g.:
 
-#### Option 1: Using environment variables
-
-Each configuration can be set with an environment variable rather than a config file. For example to run the application on port `8080` you can use the following:
-
-```sh
-PORT=8080 node index.js
+```jsx
+layout: {
+  name: 'random';
+}
 ```
 
-The [available configurations](#configurations) are documented in the next section.
+To use an external [layout extension](http://js.cytoscape.org/#extensions/layout-extensions), you must register the extension prior to rendering this component, e.g.:
 
-#### Option 2: Using config files
+```jsx
+import Cytoscape from 'cytoscape';
+import COSEBilkent from 'cytoscape-cose-bilkent';
+import React from 'react';
+import CytoscapeComponent from 'react-cytoscapejs';
 
-You can store the configuration for Pa11y Dashboard on a JSON file. You can use a different configuration file for each environment you're planning to run Pa11y Dashboard on. You can choose a specific environment to run the application from by setting the `NODE_ENV` environment variable:
+Cytoscape.use(COSEBilkent);
 
-```sh
-NODE_ENV=development node index.js
+class MyApp extends React.Component {
+  render() {
+    const elements = [
+      { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+      { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } },
+      { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
+    ];
+
+    const layout = { name: 'cose-bilkent' };
+
+    return <CytoscapeComponent elements={elements} layout={layout} />;
+  }
+}
 ```
 
-Three example files are provided in this repository, you can copy and customise them to your liking:
+### `cy`
 
-```sh
-cp config/development.sample.json config/development.json
-cp config/production.sample.json config/production.json
-cp config/test.sample.json config/test.json
+This prop allows for getting a reference to the Cytoscape `cy` reference using a React ref function. This `cy` reference can be used to access the Cytoscape API directly. E.g.:
+
+```jsx
+class MyApp extends React.Component {
+  render() {
+    return <CytoscapeComponent cy={(cy) => { this.cy = cy }}>;
+  }
+}
 ```
 
-The [available configurations](#configurations) are documented in the next section.
+## Viewport manipulation
 
-If you run into problems, check the [troubleshooting guide][#troubleshooting].
+### `pan`
 
-## Configurations
+The [panning position](http://js.cytoscape.org/#init-opts/pan) of the graph, e.g. `<CytoscapeComponent pan={ { x: 100, y: 200 } } />`.
 
-The boot configurations for Pa11y Dashboard are as follows. Look at the sample JSON files in the repo for example usage.
+### `zoom`
 
-### port
+The [zoom level](http://js.cytoscape.org/#init-opts/zoom) of the graph, e.g. `<CytoscapeComponent zoom={2} />`.
 
-*(number)* The port to run the application on. Set via a config file or the `PORT` environment variable.
+## Viewport mutability & gesture toggling
 
-### noindex
+### `panningEnabled`
 
-*(boolean)* If set to `true` (default), the dashboard will not be indexed by search engines. Set to `false` to allow indexing. Set via a config file or the `NOINDEX` environment variable.
+Whether the [panning position of the graph is mutable overall](http://js.cytoscape.org/#init-opts/panningEnabled), e.g. `<CytoscapeComponent panningEnabled={false} />`.
 
-### readonly
+### `userPanningEnabled`
 
-*(boolean)* If set to `true`, users will not be able to add, delete or run URLs (defaults to `false`). Set via a config file or the `READONLY` environment variable.
+Whether the [panning position of the graph is mutable by user gestures](http://js.cytoscape.org/#init-opts/userPanningEnabled) such as swiping, e.g. `<CytoscapeComponent userPanningEnabled={false} />`.
 
-### siteMessage
+### `minZoom`
 
-*(string)* A message to display prominently on the site home page. Defaults to `null`.
+The [minimum zoom level](http://js.cytoscape.org/#init-opts/minZoom) of the graph, e.g. `<CytoscapeComponent minZoom={0.5} />`.
 
-### webservice
+### `maxZoom`
 
-This can either be an object containing [Pa11y Webservice configurations][pa11y-webservice-config], or a string which is the base URL of a [Pa11y Webservice][pa11y-webservice] instance you are running separately. If using environment variables, prefix the webservice vars with `WEBSERVICE_`.
+The [maximum zoom level](http://js.cytoscape.org/#init-opts/maxZoom) of the graph, e.g. `<CytoscapeComponent maxZoom={2} />`.
 
-## Contributing
+### `zoomingEnabled`
 
-There are many ways to contribute to Pa11y Dashboard, we cover these in the [contributing guide](CONTRIBUTING.md) for this repo.
+Whether the [zoom level of the graph is mutable overall](http://js.cytoscape.org/#init-opts/zoomingEnabled), e.g. `<CytoscapeComponent zoomingEnabled={false} />`.
 
-If you're ready to contribute some code, you'll need to clone the repo and get set up as outlined in the [setup guide](#setup). You'll then need to start the application in test mode with:
+### `userZoomingEnabled`
 
-```sh
-NODE_ENV=test node index.js
+Whether the [zoom level of the graph is mutable by user gestures](http://js.cytoscape.org/#init-opts/userZoomingEnabled) (e.g. pinch-to-zoom), e.g. `<CytoscapeComponent userZoomingEnabled={false} />`.
+
+### `boxSelectionEnabled`
+
+Whether [shift+click-and-drag box selection is enabled](http://js.cytoscape.org/#init-opts/boxSelectionEnabled), e.g. `<CytoscapeComponent boxSelectionEnabled={false} />`.
+
+### `autoungrabify`
+
+If true, nodes [automatically can not be grabbed](http://js.cytoscape.org/#init-opts/autoungrabify) regardless of whether each node is marked as grabbable, e.g. `<CytoscapeComponent autoungrabify={true} />`.
+
+### `autolock`
+
+If true, [nodes can not be moved at all](http://js.cytoscape.org/#init-opts/autolock), e.g. `<CytoscapeComponent autolock={true} />`.
+
+### `autounselectify`
+
+If true, [elements have immutable selection state](http://js.cytoscape.org/#init-opts/autounselectify), e.g. `<CytoscapeComponent autounselectify={true} />`.
+
+## HTML attribute props
+
+These props allow for setting built-in HTML attributes on the div created by the component that holds the visualisation:
+
+### `id`
+
+The [`id`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id) attribute of the div, e.g. `<CytoscapeComponent id="myCy" />`.
+
+### `className`
+
+The [`class`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class) attribute of the div containing space-separated class names, e.g. `<CytoscapeComponent className="foo bar" />`.
+
+### `style`
+
+The [`style`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/style) attribute of the div containing CSS styles, e.g. `<CytoscapeComponent style={ { width: '600px', height: '600px' } } />`.
+
+## Custom prop types
+
+This component allows for props of custom type to be used (i.e. non JSON props), for example an object-oriented model or an [Immutable](http://facebook.github.io/immutable-js/) model. The props used to control the reading and diffing of the main props are listed below.
+
+Examples are given using Immutable. Using Immutable allows for cheaper diffs, which is useful for updating graphs with many `elements`. For example, you may specify `elements` as the following:
+
+```js
+const elements = Immutable.List([
+  Immutable.Map({ data: Immutable.Map({ id: 'foo', label: 'bar' }) })
+]);
 ```
 
-You'll now be able to run the following commands:
+### `get(object, key)`
 
-```sh
-make verify              # Verify all of the code (ESLint)
-make test                # Run all tests
-make test-integration    # Run the integration tests
+Get the value of the specified `object` at the `key`, which may be an integer in the case of lists/arrays or strings in the case of maps/objects. E.g.:
+
+```js
+const get = (object, key) => {
+  // must check type because some props may be immutable and others may not be
+  if (Immutable.Map.isMap(object) || Immutable.List.isList(object)) {
+    return object.get(key);
+  } else {
+    return object[key];
+  }
+}
 ```
 
-To compile the client-side JavaScript and CSS, you'll need the following commands. Compiled code is committed to the repository.
+The default is:
 
-```sh
-make less    # Compile the site CSS from LESS files
-make uglify  # Compile and uglify the client-side JavaScript
+```js
+const get = (object, key) => object[key];
 ```
 
-## Useful resources
+### `toJson(object)`
 
-* [Setting up An Accessibility Dashboard from Scratch with Pa11y on DigitalOcean](https://una.im/pa11y-dash/)
-* [Monitoring Web Accessibility Compliance With Pa11y Dashboard](https://www.lullabot.com/articles/monitoring-web-accessibility-compliance-with-pa11y-dashboard)
+Get the deep value of the specified `object` as non-stringified JSON. E.g.:
 
-## Troubleshooting
+```js
+const toJson = (object) => {
+  // must check type because some props may be immutable and others may not be
+  if (Immutable.isImmutable(object)) {
+    return object.toJSON();
+  } else {
+    return object;
+  }
+}
+```
 
-### Common issues
+The default is:
 
-* `500` errors or `Could not connect to pa11y-webservice` messages are often related to MongoDB. Ensure that you have the [appropriate version of MongoDB][#installing-mongodb] installed, and that it's running - it doesn't always start automatically.
-* Error messages saying that pa11y-webservice isn't running may be due to dependency installation problems. Try deleting your `pa11y-dashboard/node_modules` directory and running `npm install` again.
+```js
+const toJson = (object) => object;
+```
 
-### Create a new issue
+### `diff(objectA, objectB)`
 
-Check the [issue tracker][issues] for similar issues before creating a new one. If the problem that you're experiencing is not covered by one of the existing issues, you can [create a new issue][create-issue]. Please include your node.js and MongoDB version numbers, and your operating system, as well as any information that may be useful in debugging the issue.
+Return whether the two objects have equal value. This is used to determine if and where Cytoscape needs to be patched. E.g.:
 
-## Support and Migration
+```js
+const diff = (objectA, objectB) => objectA !== objectB; // immutable creates new objects for each operation
+```
 
-Pa11y Dashboard major versions are normally supported for 6 months after their last minor release. This means that patch-level changes will be added and bugs will be fixed. The table below outlines the end-of-support dates for major versions, and the last minor release for that version.
+The default is a shallow equality check over the fields of each object. This means that if you use the default `diff()`, you should not use arrays or objects in an element's `data` or `scratch` fields.
 
-We also maintain a [migration guide](MIGRATION.md) to help you migrate.
+Immutable benefits performance here by reducing the total number of `diff()` calls needed. For example, an unchanged `element` requires only one diff with Immutable whereas it would require many diffs with the default JSON `diff()` implementation. Basically, Immutable make diffs minimal-depth searches.
 
-| :grey_question: | Major Version | Last Minor Release | Node.js Versions | Support End Date |
-| :-------------- | :------------ | :----------------- | :--------------- | :--------------- |
-| :heart:         | 4             | N/A                | 12+              | N/A              |
-| :hourglass:     | 3             | 3.3.0              | 8+               | 2022-05-26       |
-| :skull:         | 2             | 2.4.2              | 4+               | 2020-01-16       |
-| :skull:         | 1             | 1.12               | 0.10–6           | 2016-12-05       |
+### `forEach(list, iterator)`
 
-If you're opening issues related to these, please mention the version that the issue relates to.
+Call `iterator` on each element in the `list`, in order. E.g.:
 
-## License
+```js
+const forEach = (list, iterator) => list.forEach(iterator); // same for immutable and js arrays
+```
 
-Pa11y Dashboard is licensed under the [GNU General Public License 3.0][info-license].<br/>
-Copyright &copy; 2013–2020, Team Pa11y and contributors
+The above example is the same as the default `forEach()`.
 
-[gpl]: http://www.gnu.org/licenses/gpl-3.0.html
-[mongo]: http://www.mongodb.org/
-[node]: http://nodejs.org/
-[pa11y]: https://github.com/pa11y/pa11y
-[pa11y-webservice-config]: https://github.com/pa11y/webservice#configurations
-[issues]: https://github.com/pa11y/pa11y-dashboard/issues?utf8=%E2%9C%93&q=is%3Aissue
-[create-issue]: https://github.com/pa11y/pa11y-dashboard/issues/new
-[info-node]: package.json
-[info-build]: https://travis-ci.org/pa11y/pa11y-dashboard
-[info-license]: LICENSE
-[shield-version]: https://img.shields.io/github/package-json/v/pa11y/pa11y-dashboard.svg
-[shield-node]: https://img.shields.io/node/v/pa11y/pa11y-dashboard.svg
-[shield-build]: https://img.shields.io/travis/pa11y/pa11y-dashboard/master.svg
-[shield-license]: https://img.shields.io/badge/license-GPL%203.0-blue.svg
+## Reference props
+
+### `cy()`
+
+The `cy` prop allows for getting a reference to the `cy` Cytoscape object, e.g.:
+
+```jsx
+<CytoscapeComponent cy={(cy) => { myCyRef = cy }} />
+```
+
+## Change log
+
+- v1.2.1
+  - When patching, apply layout outside of batching.
+- v1.2.0
+  - Add support for `headless`, `styleEnabled` and the following (canvas renderer) rendering hints: `hideEdgesOnViewport`, `textureOnViewport`, `motionBlur`, `motionBlurOpacity`, `wheelSensitivity`, `pixelRatio`
+  - Add setup and version explanation to README
+  - Add a default React displayName
+- v1.1.0
+  - Add `Component.normalizeElements()` utility function
+  - Update style prop docs
+- v1.0.1
+  - Update style attribute in docs example to use idiomatic React style object
+  - Add npmignore
+- v1.0.0
+  - Initial release
+  
