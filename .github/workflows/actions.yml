@@ -1,41 +1,35 @@
-name: CI
+name: build
 
 on:
-  workflow_dispatch:
-  pull_request:
   push:
     branches:
-      - main
-
-permissions:
-  contents: read
+      - master
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  test:
-    name: Test
+  build:
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
-        os: [ubuntu-latest]
+        python-version: ['3.8']
 
-    runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout demo
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: 'requirements.txt'
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python3 -m pip install -U pip
-          python3 -m pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y libkrb5-dev
+        python -m pip install --upgrade pip
+        python -m pip install tox tox-gh-actions coveralls
 
-      - name: Run demo
-        run: |
-          python3 run_demo_md.py
+    - name: Test with tox
+      run: tox
