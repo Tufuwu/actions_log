@@ -1,245 +1,412 @@
-<div align="center">
-  <br/>
-  <a href="http://pm2.keymetrics.io/" title="PM2 Keymetrics link">
-    <img width=710px src="https://raw.githubusercontent.com/Unitech/pm2/master/pres/pm2-v4.png" alt="pm2 logo">
-  </a>
-  <br/>
-<br/>
-<b>P</b>(rocess) <b>M</b>(anager) <b>2</b><br/>
-  <i>Runtime Edition</i>
-<br/><br/>
+<table><thead>
+  <tr>
+    <th>Linux</th>
+    <th>OS X</th>
+    <th>Windows</th>
+    <th>Coverage</th>
+    <th>Downloads</th>
+  </tr>
+</thead><tbody><tr>
+  <td colspan="2" align="center">
+    <a href="https://github.com/kaelzhang/node-ignore/actions/workflows/nodejs.yml">
+    <img
+      src="https://github.com/kaelzhang/node-ignore/actions/workflows/nodejs.yml/badge.svg"
+      alt="Build Status" /></a>
+  </td>
+  <td align="center">
+    <a href="https://ci.appveyor.com/project/kaelzhang/node-ignore">
+    <img
+      src="https://ci.appveyor.com/api/projects/status/github/kaelzhang/node-ignore?branch=master&svg=true"
+      alt="Windows Build Status" /></a>
+  </td>
+  <td align="center">
+    <a href="https://codecov.io/gh/kaelzhang/node-ignore">
+    <img
+      src="https://codecov.io/gh/kaelzhang/node-ignore/branch/master/graph/badge.svg"
+      alt="Coverage Status" /></a>
+  </td>
+  <td align="center">
+    <a href="https://www.npmjs.org/package/ignore">
+    <img
+      src="http://img.shields.io/npm/dm/ignore.svg"
+      alt="npm module downloads per month" /></a>
+  </td>
+</tr></tbody></table>
 
+# ignore
 
-<a title="PM2 Downloads">
-  <img src="https://img.shields.io/npm/dm/pm2" alt="Downloads per Month"/>
-</a>
+`ignore` is a manager, filter and parser which implemented in pure JavaScript according to the [.gitignore spec 2.22.1](http://git-scm.com/docs/gitignore).
 
-<a title="PM2 Downloads">
-  <img src="https://img.shields.io/npm/dy/pm2" alt="Downloads per Year"/>
-</a>
+`ignore` is used by eslint, gitbook and [many others](https://www.npmjs.com/browse/depended/ignore).
 
-<a href="https://badge.fury.io/js/pm2" title="NPM Version Badge">
-   <img src="https://badge.fury.io/js/pm2.svg" alt="npm version">
-</a>
+Pay **ATTENTION** that [`minimatch`](https://www.npmjs.org/package/minimatch) (which used by `fstream-ignore`) does not follow the gitignore spec.
 
-<a href="https://travis-ci.com/github/Unitech/pm2" title="PM2 Tests">
-  <img src="https://travis-ci.org/Unitech/pm2.svg?branch=master" alt="Build Status"/>
-</a>
+To filter filenames according to a .gitignore file, I recommend this npm package, `ignore`.
 
-<br/>
-<br/>
-<br/>
-</div>
+To parse an `.npmignore` file, you should use `minimatch`, because an `.npmignore` file is parsed by npm using `minimatch` and it does not work in the .gitignore way.
 
+### Tested on
 
-PM2 is a production process manager for Node.js applications with a built-in load balancer. It allows you to keep applications alive forever, to reload them without downtime and to facilitate common system admin tasks.
+`ignore` is fully tested, and has more than **five hundreds** of unit tests.
 
-Starting an application in production mode is as easy as:
+- Linux + Node: `0.8` - `7.x`
+- Windows + Node: `0.10` - `7.x`, node < `0.10` is not tested due to the lack of support of appveyor.
 
-```bash
-$ pm2 start app.js
+Actually, `ignore` does not rely on any versions of node specially.
+
+Since `4.0.0`, ignore will no longer support `node < 6` by default, to use in node < 6, `require('ignore/legacy')`. For details, see [CHANGELOG](https://github.com/kaelzhang/node-ignore/blob/master/CHANGELOG.md).
+
+## Table Of Main Contents
+
+- [Usage](#usage)
+- [`Pathname` Conventions](#pathname-conventions)
+- See Also:
+  - [`glob-gitignore`](https://www.npmjs.com/package/glob-gitignore) matches files using patterns and filters them according to gitignore rules.
+- [Upgrade Guide](#upgrade-guide)
+
+## Install
+
+```sh
+npm i ignore
 ```
 
-PM2 is constantly assailed by [more than 1800 tests](https://app.travis-ci.com/github/Unitech/pm2/branches).
+## Usage
 
-Official website: [https://pm2.keymetrics.io/](https://pm2.keymetrics.io/)
-
-Works on Linux (stable) & macOS (stable) & Windows (stable). All Node.js versions are supported starting Node.js 12.X.
-
-
-### Installing PM2
-
-With NPM:
-
-```bash
-$ npm install pm2 -g
+```js
+import ignore from 'ignore'
+const ig = ignore().add(['.abc/*', '!.abc/d/'])
 ```
 
-You can install Node.js easily with [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) or [ASDF](https://blog.natterstefan.me/how-to-use-multiple-node-version-with-asdf).
+### Filter the given paths
 
-### Start an application
+```js
+const paths = [
+  '.abc/a.js',    // filtered out
+  '.abc/d/e.js'   // included
+]
 
-You can start any application (Node.js, Python, Ruby, binaries in $PATH...) like that:
-
-```bash
-$ pm2 start app.js
+ig.filter(paths)        // ['.abc/d/e.js']
+ig.ignores('.abc/a.js') // true
 ```
 
-Your app is now daemonized, monitored and kept alive forever.
+### As the filter function
 
-### Managing Applications
-
-Once applications are started you can manage them easily:
-
-![Process listing](https://github.com/Unitech/pm2/raw/master/pres/pm2-ls-v2.png)
-
-To list all running applications:
-
-```bash
-$ pm2 list
+```js
+paths.filter(ig.createFilter()); // ['.abc/d/e.js']
 ```
 
-Managing apps is straightforward:
+### Win32 paths will be handled
 
-```bash
-$ pm2 stop     <app_name|namespace|id|'all'|json_conf>
-$ pm2 restart  <app_name|namespace|id|'all'|json_conf>
-$ pm2 delete   <app_name|namespace|id|'all'|json_conf>
+```js
+ig.filter(['.abc\\a.js', '.abc\\d\\e.js'])
+// if the code above runs on windows, the result will be
+// ['.abc\\d\\e.js']
 ```
 
-To have more details on a specific application:
+## Why another ignore?
 
-```bash
-$ pm2 describe <id|app_name>
+- `ignore` is a standalone module, and is much simpler so that it could easy work with other programs, unlike [isaacs](https://npmjs.org/~isaacs)'s [fstream-ignore](https://npmjs.org/package/fstream-ignore) which must work with the modules of the fstream family.
+
+- `ignore` only contains utility methods to filter paths according to the specified ignore rules, so
+  - `ignore` never try to find out ignore rules by traversing directories or fetching from git configurations.
+  - `ignore` don't cares about sub-modules of git projects.
+
+- Exactly according to [gitignore man page](http://git-scm.com/docs/gitignore), fixes some known matching issues of fstream-ignore, such as:
+  - '`/*.js`' should only match '`a.js`', but not '`abc/a.js`'.
+  - '`**/foo`' should match '`foo`' anywhere.
+  - Prevent re-including a file if a parent directory of that file is excluded.
+  - Handle trailing whitespaces:
+    - `'a '`(one space) should not match `'a  '`(two spaces).
+    - `'a \ '` matches `'a  '`
+  - All test cases are verified with the result of `git check-ignore`.
+
+# Methods
+
+## .add(pattern: string | Ignore): this
+## .add(patterns: Array<string | Ignore>): this
+
+- **pattern** `String | Ignore` An ignore pattern string, or the `Ignore` instance
+- **patterns** `Array<String | Ignore>` Array of ignore patterns.
+
+Adds a rule or several rules to the current manager.
+
+Returns `this`
+
+Notice that a line starting with `'#'`(hash) is treated as a comment. Put a backslash (`'\'`) in front of the first hash for patterns that begin with a hash, if you want to ignore a file with a hash at the beginning of the filename.
+
+```js
+ignore().add('#abc').ignores('#abc')    // false
+ignore().add('\\#abc').ignores('#abc')   // true
 ```
 
-To monitor logs, custom metrics, application information:
+`pattern` could either be a line of ignore pattern or a string of multiple ignore patterns, which means we could just `ignore().add()` the content of a ignore file:
 
-```bash
-$ pm2 monit
+```js
+ignore()
+.add(fs.readFileSync(filenameOfGitignore).toString())
+.filter(filenames)
 ```
 
-[More about Process Management](https://pm2.keymetrics.io/docs/usage/process-management/)
+`pattern` could also be an `ignore` instance, so that we could easily inherit the rules of another `Ignore` instance.
 
-### Cluster Mode: Node.js Load Balancing & Zero Downtime Reload
+## <strike>.addIgnoreFile(path)</strike>
 
-The Cluster mode is a special mode when starting a Node.js application, it starts multiple processes and load-balance HTTP/TCP/UDP queries between them. This increase overall performance (by a factor of x10 on 16 cores machines) and reliability (faster socket re-balancing in case of unhandled errors).
+REMOVED in `3.x` for now.
 
-![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/cluster.png)
+To upgrade `ignore@2.x` up to `3.x`, use
 
-Starting a Node.js application in cluster mode that will leverage all CPUs available:
+```js
+import fs from 'fs'
 
-```bash
-$ pm2 start api.js -i <processes>
+if (fs.existsSync(filename)) {
+  ignore().add(fs.readFileSync(filename).toString())
+}
 ```
 
-`<processes>` can be `'max'`, `-1` (all cpu minus 1) or a specified number of instances to start.
+instead.
 
-**Zero Downtime Reload**
+## .filter(paths: Array&lt;Pathname&gt;): Array&lt;Pathname&gt;
 
-Hot Reload allows to update an application without any downtime:
-
-```bash
-$ pm2 reload all
+```ts
+type Pathname = string
 ```
 
-[More informations about how PM2 make clustering easy](https://pm2.keymetrics.io/docs/usage/cluster-mode/)
+Filters the given array of pathnames, and returns the filtered array.
 
-### Container Support
+- **paths** `Array.<Pathname>` The array of `pathname`s to be filtered.
 
-With the drop-in replacement command for `node`, called `pm2-runtime`, run your Node.js application in a hardened production environment.
-Using it is seamless:
+### `Pathname` Conventions:
 
-```
-RUN npm install pm2 -g
-CMD [ "pm2-runtime", "npm", "--", "start" ]
-```
+#### 1. `Pathname` should be a `path.relative()`d pathname
 
-[Read More about the dedicated integration](https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/)
+`Pathname` should be a string that have been `path.join()`ed, or the return value of `path.relative()` to the current directory,
 
-### Host monitoring speedbar
+```js
+// WRONG, an error will be thrown
+ig.ignores('./abc')
 
-PM2 allows to monitor your host/server vitals with a monitoring speedbar.
+// WRONG, for it will never happen, and an error will be thrown
+// If the gitignore rule locates at the root directory,
+// `'/abc'` should be changed to `'abc'`.
+// ```
+// path.relative('/', '/abc')  -> 'abc'
+// ```
+ig.ignores('/abc')
 
-To enable host monitoring:
+// WRONG, that it is an absolute path on Windows, an error will be thrown
+ig.ignores('C:\\abc')
 
-```bash
-$ pm2 set pm2:sysmonit true
-$ pm2 update
-```
+// Right
+ig.ignores('abc')
 
-![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/vitals.png)
-
-### Terminal Based Monitoring
-
-![Monit](https://github.com/Unitech/pm2/raw/master/pres/pm2-monit.png)
-
-Monitor all processes launched straight from the command line:
-
-```bash
-$ pm2 monit
+// Right
+ig.ignores(path.join('./abc'))  // path.join('./abc') -> 'abc'
 ```
 
-### Log Management
+In other words, each `Pathname` here should be a relative path to the directory of the gitignore rules.
 
-To consult logs just type the command:
+Suppose the dir structure is:
 
-```bash
-$ pm2 logs
+```
+/path/to/your/repo
+    |-- a
+    |   |-- a.js
+    |
+    |-- .b
+    |
+    |-- .c
+         |-- .DS_store
 ```
 
-Standard, Raw, JSON and formated output are available.
+Then the `paths` might be like this:
 
-Examples:
-
-```bash
-$ pm2 logs APP-NAME       # Display APP-NAME logs
-$ pm2 logs --json         # JSON output
-$ pm2 logs --format       # Formated output
-
-$ pm2 flush               # Flush all logs
-$ pm2 reloadLogs          # Reload all logs
+```js
+[
+  'a/a.js'
+  '.b',
+  '.c/.DS_store'
+]
 ```
 
-To enable log rotation install the following module
+#### 2. filenames and dirnames
 
-```bash
-$ pm2 install pm2-logrotate
+`node-ignore` does NO `fs.stat` during path matching, so for the example below:
+
+```js
+// First, we add a ignore pattern to ignore a directory
+ig.add('config/')
+
+// `ig` does NOT know if 'config', in the real world,
+//   is a normal file, directory or something.
+
+ig.ignores('config')
+// `ig` treats `config` as a file, so it returns `false`
+
+ig.ignores('config/')
+// returns `true`
 ```
 
-[More about log management](https://pm2.keymetrics.io/docs/usage/log-management/)
+Specially for people who develop some library based on `node-ignore`, it is important to understand that.
 
-### Startup Scripts Generation
+Usually, you could use [`glob`](http://npmjs.org/package/glob) with `option.mark = true` to fetch the structure of the current directory:
 
-PM2 can generate and configure a Startup Script to keep PM2 and your processes alive at every server restart.
+```js
+import glob from 'glob'
 
-Init Systems Supported: **systemd**, **upstart**, **launchd**, **rc.d**
+glob('**', {
+  // Adds a / character to directory matches.
+  mark: true
+}, (err, files) => {
+  if (err) {
+    return console.error(err)
+  }
 
-```bash
-# Generate Startup Script
-$ pm2 startup
-
-# Freeze your process list across server restart
-$ pm2 save
-
-# Remove Startup Script
-$ pm2 unstartup
+  let filtered = ignore().add(patterns).filter(files)
+  console.log(filtered)
+})
 ```
 
-[More about Startup Scripts Generation](https://pm2.keymetrics.io/docs/usage/startup/)
+## .ignores(pathname: Pathname): boolean
 
-### Updating PM2
+> new in 3.2.0
 
-```bash
-# Install latest PM2 version
-$ npm install pm2@latest -g
-# Save process list, exit old PM2 & restore all processes
-$ pm2 update
+Returns `Boolean` whether `pathname` should be ignored.
+
+```js
+ig.ignores('.abc/a.js')    // true
 ```
 
-*PM2 updates are seamless*
+## .createFilter()
 
-## PM2+ Monitoring
+Creates a filter function which could filter an array of paths with `Array.prototype.filter`.
 
-If you manage your apps with PM2, PM2+ makes it easy to monitor and manage apps across servers.
+Returns `function(path)` the filter function.
 
-![https://app.pm2.io/](https://pm2.io/img/app-overview.png)
+## .test(pathname: Pathname) since 5.0.0
 
-Feel free to try it:
+Returns `TestResult`
 
-[Discover the monitoring dashboard for PM2](https://app.pm2.io/)
+```ts
+interface TestResult {
+  ignored: boolean
+  // true if the `pathname` is finally unignored by some negative pattern
+  unignored: boolean
+}
+```
 
-Thanks in advance and we hope that you like PM2!
+- `{ignored: true, unignored: false}`: the `pathname` is ignored
+- `{ignored: false, unignored: true}`: the `pathname` is unignored
+- `{ignored: false, unignored: false}`: the `pathname` is never matched by any ignore rules.
 
-## CHANGELOG
+## static `ignore.isPathValid(pathname): boolean` since 5.0.0
 
-[CHANGELOG](https://github.com/Unitech/PM2/blob/master/CHANGELOG.md)
+Check whether the `pathname` is an valid `path.relative()`d path according to the [convention](#1-pathname-should-be-a-pathrelatived-pathname).
 
-## Contributors
+This method is **NOT** used to check if an ignore pattern is valid.
 
-[Contributors](http://pm2.keymetrics.io/hall-of-fame/)
+```js
+ignore.isPathValid('./foo')  // false
+```
 
-## License
+## ignore(options)
 
-PM2 is made available under the terms of the GNU Affero General Public License 3.0 (AGPL 3.0).
-For other licenses [contact us](mailto:contact@keymetrics.io).
+### `options.ignorecase` since 4.0.0
+
+Similar as the `core.ignorecase` option of [git-config](https://git-scm.com/docs/git-config), `node-ignore` will be case insensitive if `options.ignorecase` is set to `true` (the default value), otherwise case sensitive.
+
+```js
+const ig = ignore({
+  ignorecase: false
+})
+
+ig.add('*.png')
+
+ig.ignores('*.PNG')  // false
+```
+
+### `options.ignoreCase?: boolean` since 5.2.0
+
+Which is alternative to `options.ignoreCase`
+
+### `options.allowRelativePaths?: boolean` since 5.2.0
+
+This option brings backward compatibility with projects which based on `ignore@4.x`. If `options.allowRelativePaths` is `true`, `ignore` will not check whether the given path to be tested is [`path.relative()`d](#pathname-conventions).
+
+However, passing a relative path, such as `'./foo'` or `'../foo'`, to test if it is ignored or not is not a good practise, which might lead to unexpected behavior
+
+```js
+ignore({
+  allowRelativePaths: true
+}).ignores('../foo/bar.js') // And it will not throw
+```
+
+****
+
+# Upgrade Guide
+
+## Upgrade 4.x -> 5.x
+
+Since `5.0.0`, if an invalid `Pathname` passed into `ig.ignores()`, an error will be thrown, unless `options.allowRelative = true` is passed to the `Ignore` factory.
+
+While `ignore < 5.0.0` did not make sure what the return value was, as well as
+
+```ts
+.ignores(pathname: Pathname): boolean
+
+.filter(pathnames: Array<Pathname>): Array<Pathname>
+
+.createFilter(): (pathname: Pathname) => boolean
+
+.test(pathname: Pathname): {ignored: boolean, unignored: boolean}
+```
+
+See the convention [here](#1-pathname-should-be-a-pathrelatived-pathname) for details.
+
+If there are invalid pathnames, the conversion and filtration should be done by users.
+
+```js
+import {isPathValid} from 'ignore' // introduced in 5.0.0
+
+const paths = [
+  // invalid
+  //////////////////
+  '',
+  false,
+  '../foo',
+  '.',
+  //////////////////
+
+  // valid
+  'foo'
+]
+.filter(isValidPath)
+
+ig.filter(paths)
+```
+
+## Upgrade 3.x -> 4.x
+
+Since `4.0.0`, `ignore` will no longer support node < 6, to use `ignore` in node < 6:
+
+```js
+var ignore = require('ignore/legacy')
+```
+
+## Upgrade 2.x -> 3.x
+
+- All `options` of 2.x are unnecessary and removed, so just remove them.
+- `ignore()` instance is no longer an [`EventEmitter`](nodejs.org/api/events.html), and all events are unnecessary and removed.
+- `.addIgnoreFile()` is removed, see the [.addIgnoreFile](#addignorefilepath) section for details.
+
+****
+
+# Collaborators
+
+- [@whitecolor](https://github.com/whitecolor) *Alex*
+- [@SamyPesse](https://github.com/SamyPesse) *Samy Pessé*
+- [@azproduction](https://github.com/azproduction) *Mikhail Davydov*
+- [@TrySound](https://github.com/TrySound) *Bogdan Chadkin*
+- [@JanMattner](https://github.com/JanMattner) *Jan Mattner*
+- [@ntwb](https://github.com/ntwb) *Stephen Edgar*
+- [@kasperisager](https://github.com/kasperisager) *Kasper Isager*
+- [@sandersn](https://github.com/sandersn) *Nathan Shively-Sanders*

@@ -1,24 +1,61 @@
-/node_modules
+# test
+test/ts/*.js
+
+# coverage
+coverage
+.nyc_output
+/legacy.js
+
+# yarn
+*.lock
+
+# php files
+index.php
+
+# Numerous always-ignore extensions
+*.bak
+*.patch
+*.diff
+*.err
+*.orig
 *.log
-*.pid
-test/child
-*.iml
-.idea/**
-*.heapsnapshot
-*.cpuprofile
-.cache-require-paths.json
-dist/
-*.deb
-*.rpm
-.DS_Store
-*.swp
+*.rej
 *.swo
-currentTagChangelog.md
-joblog-X
-test/fixtures/path-check*.txt
-yarn.lock
-*.tar.gz
-e2e_time
-unit_time
-*.heapprofile
-a.out
+*.swp
+*.zip
+*.vi
+*~
+*.sass-cache
+package-lock.json
+
+# npm package
+*.tgz
+
+# OS or Editor folders
+.DS_Store
+._*
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+*.sublime-project
+nbproject
+thumbs.db
+*.*-workspace
+
+# Folders to ignore
+.hg
+.svn
+.CVS
+.idea
+node_modules
+old/
+*-old/
+*-notrack/
+no-track/
+build/
+combo/
+reference/
+jscoverage_lib/
+temp/
