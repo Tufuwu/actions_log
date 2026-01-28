@@ -1,17 +1,30 @@
-# Byte-compiled / optimized files
-__pycache__/
-*.py[cod]
+# macOS
+*.DS_Store
 
-# Distribution / packaging
-env/
-build/
-dist/
-/MANIFEST
-*.egg-info/
-*.egg
+# API credentials
+*.ini
 
-# pytest
+# May not want to commit lyrics text files
+*.txt
+*.json
+
+# Jupyter
+/Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Test files
 .cache/
+.tox
+lyricsgenius.egg-info
+fixtures
 
-# Coverage report
-.coverage
+# Python module things
+*.pyc
+
+# Python cache stuff
+*.egg-info
+__pycache__
+dist
+build
+.idea
