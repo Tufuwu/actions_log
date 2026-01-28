@@ -1,258 +1,229 @@
-[![Build Status](https://travis-ci.org/edio/randrctl.svg?branch=master)](https://travis-ci.org/edio/randrctl)
+[![Build Status](https://github.com/laowantong/paroxython/actions/workflows/build.yml/badge.svg)](https://github.com/laowantong/paroxython/actions/workflows/build.yml)
+[![codecov](https://img.shields.io/codecov/c/github/laowantong/paroxython/master)](https://codecov.io/gh/laowantong/paroxython)
+[![Checked with mypy](https://img.shields.io/badge/typing-mypy-brightgreen)](http://mypy-lang.org/)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/73432ed4c5294326ba6279bbbb0fe2e6)](https://www.codacy.com/manual/laowantong/paroxython)
+[![Updates](https://pyup.io/repos/github/laowantong/paroxython/shield.svg)](https://pyup.io/repos/github/laowantong/paroxython/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/paroxython)
+[![GitHub Release](https://img.shields.io/github/release/laowantong/paroxython.svg?style=flat)]()
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/laowantong/paroxython)
+[![paroxython SLOC](https://img.shields.io/badge/main%20program-~1850%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython)
+[![tests SLOC](https://img.shields.io/badge/tests-~2550%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/tests)
+[![helpers SLOC](https://img.shields.io/badge/helpers-~900%20SLOC-blue)](https://github.com/laowantong/paroxython/blob/master/helpers)
+[![spec features](https://img.shields.io/badge/spec-173%20features-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/spec.md)
+[![taxonomy mappings](https://img.shields.io/badge/taxonomy-282%20mappings-blue)](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/taxonomy.tsv)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/y/laowantong/paroxython.svg?style=flat)
+[![Downloads](https://pepy.tech/badge/paroxython/week)](https://pepy.tech/project/paroxython/week)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Band-aid](https://badgen.net/badge/not%C2%A0%C2%A0%F0%9F%85%B3%F0%9F%85%B4%F0%9F%85%B0%F0%9F%85%B3/yet/F3D9C5?labelColor=F3D9C5)](https://youtu.be/QcbR1J_4ICg?t=54)
 
-# randrctl
+<p align="center">
+  <a href="https://laowantong.github.io/paroxython/index.html">
+  <img src="docs/resources/logo.png">
+  </a>
+</p>
 
-Screen profiles manager for X.org.
+## Introduction
 
-_randrctl_ remembers your X.org screen configurations (position of displays, rotation, scaling, etc.) and switches
-between them automatically as displays are connected or manually, when necessary:
-```
-randrctl switch-to home
-randrctl switch-to office
-```
+Paroxython is a set of command line tools which **tag** and **filter** by algorithmic features your collection of Python programming exercises.
 
-## Install
+### Audience
 
-_randrctl_ depends on `xrandr` utility and won't work without it. Please install it first.
+You are a teacher, in charge of an introductory programming course in an educational institution. Over the years, you have accumulated many—far too many—programs and code snippets that may be of interest to your students.
 
-### Archlinux
+Or, as a seasoned developer, you would like to share your knowledge by helping a loved one learn how to code. A cursory search for pedagogical material yields an overwhelming amount of websites and repositories stuffed with Python programs of various levels (e.g.,
+[1](https://github.com/TheAlgorithms/Python),
+[2](http://rosettacode.org/wiki/Category:Python),
+[3](https://www.programming-idioms.org/about#about-block-language-coverage),
+[4](https://github.com/codebasics/py),
+[5](https://github.com/keon/algorithms),
+[6](https://github.com/OmkarPathak/Python-Programs),
+and a lot more from [Awesome Python in Education](https://github.com/quobit/awesome-python-in-education)).
 
-https://aur.archlinux.org/packages/randrctl-git/
-https://aur.archlinux.org/packages/randrctl/
+In any case, the Python source codes you have gathered are typically
+**numerous** (hundreds or even thousands),
+**reasonably sized** (anything below 100 lines of code),
+and **educational** in nature (e.g., snippets, examples, quizzes, exercise solutions, classic algorithms).
+The programming concepts you plan to teach remain relatively **low level** (e.g. assignments, nested loops, accumulation patterns, tail recursive functions, etc.).
 
-```
-$ randrctl setup config > ${XDG_CONFIG_HOME:-$HOME/.config}/randrctl/config.yaml
-```
+If all that sounds familiar, keep reading me.
 
-### PyPi
+### Main goals
 
-```
-# pip install randrctl
+Paroxython aims to help you select, from your collection, the one program that best suits your needs. For instance, it will gladly answer the following questions:
 
-# randrctl setup udev > /etc/udev/rules.d/99-randrctl.rules
-# randrctl setup completion > /usr/share/bash-completion/completions/randrctl
+> - How can this concept be illustrated?
+> - What problems use the same algorithmic and data structures as this one?
+> - What homework assignment should I give my students so they can practice the content of the last lesson?
 
-$ randrctl setup config > ${XDG_CONFIG_HOME:-$HOME/.config}/randrctl/config.yaml
-```
+Moreover, since Paroxython knows what your class knows, it can recommend the right program at the right time:
 
-### Manually from sources
+> - What would make a good review exercise?
+> - Which exercises can I give on this exam?
+> - What is the current learning cost of this example?
 
-```
-$ git clone https://github.com/edio/randrctl.git
-$ cd randrctl
+In the long run, Paroxython may guide you and somehow make you rethink your course outline:
 
-# python setup.py install
+> - What are the prerequisites for the concept of assignment?
+> - Do I have enough material to introduce subroutines before I even talk about conditionals and loops?
+> - Among the loops, which must come first: the most powerful (`while`), or the most useful (`for`)?
+> - How to logically structure this bunch of usual iterative patterns?
+> - What are the _basics_, exactly?
 
-# randrctl setup udev > /etc/udev/rules.d/99-randrctl.rules
-# randrctl setup completion > /usr/share/bash-completion/completions/randrctl
+All issues on which the author changed his mind since he started to work on this project!
 
-$ randrctl setup config > ${XDG_CONFIG_HOME:-$HOME/.config}/randrctl/config.yaml
-```
+In an ideal world, Paroxython could even put an end to the deadliest religious wars, with rational, data-driven arguments:
 
-## Usage
+> - Father, is it a sin to exit early?
+> - Should a real byte use a mask?
 
-Usage is very simple:
+### How it works
 
-0. Setup your screen to suit your needs (randrctl does not handle that)
+<p align="center">
+  <a href="https://laowantong.github.io/paroxython/developer_manual/index.html">
+  <img src="docs/resources/waterfall.png">
+  </a>
+</p>
 
-1. Dump settings with randrctl to a named profile
+Paroxython starts from a given folder of **programs**. Its contents is parsed, and all features that meet the provided **specifications** are labelled and associated with their spans (e.g., `"assignment_lhs_identifier:a": 4, 6, 18` or `"loop_with_late_exit:while": 3-7, 20-29`).
 
-  ```randrctl dump -e home```
+These **labels** constitute only scattered knowledge. The next step is to map them onto a **taxonomy** designed with basic hierarchical constraints in mind (e.g., the fact that the introduction of the concept of early exit must come after that of loop, which itself requires that of control flow, is expressed by the _taxon_ `"flow/loop/exit/early"`).
 
-2. Re-apply those settings, whenever you need them
+<p align="center">
+  <a href="https://laowantong.github.io/paroxython/user_manual/index.html#taxonomy">
+  <img src="docs/resources/tree.png" alt="A taxonomy.">
+  </a>
+  <br>
+  <em>Extract of the taxonomy generated from <a href="https://github.com/TheAlgorithms/Python">The Algorithms - Python</a>.<br>Click to jump to its full dynamic version in the user manual.</em>
+</p>
 
-  ```randrctl switch-to home```
+Everything is then persisted in a tag **database**, which can later be filtered through a **pipeline** of commands, for instance:
 
-3. ... or let randrctl to inspect currently connected displays and choose profile that fits them best
+- _include_ only the programs which feature a recursive function;
+- _exclude_ this or that program you want to set aside for the exam;
+- “_impart_” all programs studied so far, _i.e_, consider that all the notions they implement are acquired.
 
-  ```randrctl auto```
+The result is a list of program **recommendations** ordered by increasing learning cost.
 
-  Auto-switching will also happen automatically if provided udev rules are installed to the system.
-  
-4. For more info on usage refer to help
+### Example
 
-  ```randrctl --help```
+Suppose that the `programs` directory contains [these simple programs](https://wiki.python.org/moin/SimplePrograms).
 
-### Auto-switching<a name="auto"></a>
+First, build [this tag database](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_db.json):
 
-```randrctl``` can associate profile with currently connected displays and switch to this profile automatically whenever
-same (or similar) set of displays is connected.
-
-Profile is matched to the set of connected displays by evaluating one or more of the following rules for every connected
-display:
-
-* list of supported modes of connected display includes the current mode
-
-  ```randrctl dump -m profile1```
-
-  You can use this to create profile that is activated whenever connected display supports the mode that is currently
-  set for that output.
-
-* preferred mode of connected display is the current mode
-
-  ```randrctl dump -p profile2```
-
-  Display can support wide range of modes from 640x480 to 1920x1200, but prefer only one of those. When dumped this way,
-  profile is considered a match if connected display prefers the mode, that is currently set for it.
-
-* unique identifier of connected display is exactly tha same
-
-  ```randrctl dump -e profile3```
-
-  Unique identifier (edid) of every display is dumped with the profile, so it matches, only if exactly same displays
-  are connected.
-
-Naturally, the more specific the rule, the bigger weight it has, so in case if you invoked those 3 dump commands above
-with the same displays connected, `profile3` will be chosen as the best (i.e. the most specific) match.
-
-It is possible to specify any combination of `-m -p -e` keys to dump command. In this case randrctl will try to match
-all the rules combining them with logical AND (for example, display must support and at the same time prefer the mode).
-Although such combination of rules might seem redundant (because if the more specific rule matches, the more generic
-will do too), it might have sense if rule is edited manually.
-
-If `randrctl dump` is invoked without additional options, it dumps only screen setup, so profile won't be considered
-during auto-switching.
-
-
-### Prior/Post hooks
-
-randrctl can execute custom commands (hooks) before and after switching to profile or if switching fails. Hooks are
-specified in config file `$XDG_CONFIG_HOME/randrctl/config.yaml`
-
-```
-hooks:
-    prior_switch: /usr/bin/killall -SIGSTOP i3
-    post_switch: /usr/bin/killall -SIGCONT i3 && /usr/bin/notify-send -u low "randrctl" "switched to $randr_profile"
-    post_fail: /usr/bin/killall -SIGCONT i3 && /usr/bin/notify-send -u critical "randrctl error" "$randr_error"
+```shell
+> paroxython collect programs
+Labelling 21 programs.
+Mapping taxonomy on 21 programs.
+Writing programs_db.json.
 ```
 
-The typical use-case of this is displaying desktop notification with libnotify.
+Then, filter it through [this pipeline](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_pipe.py):
 
-I also use it to pause i3 window manager as it was known to crash sometimes during the switch.
-
-
-### Profile format
-
-Profile is a simple text file in YAML format. It can be edited manually, however it is rarely required in practice
-because `randrctl dump` handles most common cases.
-
-```
-match:
-    LVDS1: {}
-    DP1:
-        prefers: 1920x1080
-outputs:
-    LVDS1:
-        mode: 1366x768
-        panning: 1366x1080
-    DP1:
-        mode: 1920x1080
-        pos: 1366x0
-        rotate: inverted
-primary: DP1
+```shell
+> paroxython recommend programs
+Processing 5 commands on 21 programs.
+  19 programs remaining after operation 1 (impart).
+  18 programs remaining after operation 2 (exclude).
+  12 programs remaining after operation 3 (exclude).
+  10 programs remaining after operation 4 (include).
+  10 programs remaining after operation 5 (hide).
+Dumped: programs_recommendations.md.
 ```
 
-Profile is required to contain 2 sections (`outputs` and `primary`). That is what dumped when `randrctl dump` is invoked
-without additional options.
-
-The `match` section is optional and is dumped only when one of the auto-switching rules is specified.
+Et voilà, [your recommendation report](https://github.com/laowantong/paroxython/blob/master/examples/simple/programs_recommendations.md)!
 
 
-#### Outputs
+## Installation and test-drive
 
-Each property of `outputs` section references output as seen in xrandr (i.e. *DP1*, *HDMI2*, etc.). Meaning of the
-properties is the same as in the xrandr utility.
+### Command line
 
-`mode` is mandatory, the others may be omitted.
+Much to no one's surprise:
 
 ```
-DP1-2: 
-    mode: 1920x1200
-    panning: 2496x1560+1920+0
-    pos: 1920x0
-    rate: 60
-    rotate: normal
-    scale: 1.3x1.3
+python -m pip install paroxython
 ```
 
-
-#### Primary
-
-Name of the primary output as seen in xrandr.
+The following command should print a help message and exit:
 
 ```
-primary: eDP1
+paroxython --help
 ```
 
-#### Match
+### IPython magic command
 
-Set of rules for auto-switching.
+If you use Jupyter notebook/lab, you've also just installed a so-called magic command. Load it like this:
 
-The minimum rule is
-
-```
-HDMI1: {}
+```python
+%load_ext paroxython
 ```
 
-which means, that something must be connected to that output.
+This should print `"paroxython 0.7.0 loaded."`. Run it on a cell of Python code:
 
-Rule corresponding to `randrctl dump -m` would be
-
-```
-HDMI1:
-    supports: 1920x1080
-```
-
-`randrctl dump -p` is
-
-```
-HDMI1:
-    prefers: 1920x1080
+```python
+%%paroxython                          # Lines
+def fibonacci(n):                     # 2
+    result = []                       # 3
+    (a, b) = (0, 1)                   # 4
+    while a < n:                      # 5
+        result.append(a)              # 6
+        (a, b) = (b, a + b)           # 7
+    return result                     # 8
 ```
 
-and `randrctl dump -e` is
+| Taxon | Lines |
+|:--|:--|
+| `call/subroutine/method/sequence/list/append` | 6 |
+| `condition/inequality` | 5 |
+| `def/subroutine/function/impure` | 2-8 |
+| `def/subroutine/parameter/arg` | 2 |
+| `flow/loop/exit/late` | 5-7 |
+| `flow/loop/while` | 5-7 |
+| `meta/count/program/sloc/8` | 2-8 |
+| `meta/count/subroutine/sloc/7` | 2-8 |
+| `meta/count/variety/3` | 2-8 |
+| `meta/program` | 2-8 |
+| `operator/arithmetic/addition` | 7 |
+| `style/procedural` | 2-8 |
+| `type/number/integer/literal` | 4 |
+| `type/number/integer/literal/zero` | 4 |
+| `type/sequence/list` | 6 |
+| `type/sequence/list/literal/empty` | 3 |
+| `type/sequence/tuple/literal` | 4, 4, 7, 7 |
+| `var/assignment/explicit/parallel` | 4 |
+| `var/assignment/explicit/parallel/slide` | 7 |
+| `var/assignment/explicit/single` | 3 |
+| `var/assignment/implicit/parameter` | 2 |
+| `var/scope/local` | 2-8, 2-8, 2-8, 2-8 |
 
-```
-HDMI1:
-    edid: efdbca373951c898c5775e1c9d26c77f
-```
+As you can see, in this program, Paroxython identifies among others:
 
-`edid` is md5 hash of actual display's `edid`. To obtain that value, use `randrctl show`.
+- the use of the [procedural paradigm](https://en.wikipedia.org/wiki/Procedural_programming) (`style/procedural`);
+- an im[pure function](https://en.wikipedia.org/wiki/Pure_function) (`def/subroutine/function/impure`);
+- a `while` loop (`flow/loop/while`) with a late exit (`flow/loop/exit/late`);
+- a little bit of voodoo on lists (`type/sequence/list/literal/empty` and `call/subroutine/method/sequence/list/append`);
+- a simple [tuple assignment](https://en.wikibooks.org/wiki/Python_Programming/Tuples#Packing_and_Unpacking) (`var/assignment/explicit/parallel`). Note that we distinguish between explicit (with `=`) and implicit (parameters and iteration variables) assignments;
+- a “sliding” tuple assignment (`var/assignment/explicit/parallel/slide`). If the denomination is unique to us, the pattern itself occurs in a number of programs: implementations of [C-finite sequences](https://en.wikipedia.org/wiki/Constant-recursive_sequence) with C greater than 1, [Greatest Common Divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor), [Quicksort](https://en.wikipedia.org/wiki/Quicksort), etc.
+- four local variables (`var/scope/local`);
+- an estimation of the variety of concepts involved (`meta/count/variety/***`), depending on the number of lines, features and distinct features.
 
-As was mentioned, `prefers`, `supports` and `edid` can be combined in the same rule, so it is possible to manually
-create a more sophisticated rule
+The magic command `%%paroxython` (corresponding to the subcommand [`tag`](https://laowantong.github.io/paroxython/cli_tag.html)) only scratches the surface of the system. As shown before, to estimate the learning cost of the features and get actionable recommendations, you will need first to construct the tag database with [`collect`](https://laowantong.github.io/paroxython/cli_collect.html), and then call [`recommend`](https://laowantong.github.io/paroxython/cli_recommend.html) on a pipeline of yours.
 
-```
-match:
-    LVDS1: {}
-    HDMI1:
-        prefers: 1600x1200
-        supports: 800x600
-outputs:
-    LVDS1: 
-        ...
-    HDMI1:
-        ...
-```
+# Read them
 
-#### Priority
+Although this is still a work-in-progress, Paroxython should already be fairly well [documented](https://laowantong.github.io/paroxython/index.html):
 
-When more than one profile matches current output configuration priority can be used to highlight preferred profile.
-```
-priority: 100
-match:
-    ...
-outputs:
-    ...
-```
-Default priority is `100`. To set profile priority use `-P <priority>` with `dump` command. Like this:
-`randrctl dump -e default -P 50`
+- [User manual](https://laowantong.github.io/paroxython/user_manual/index.html):
+  - [write a command pipeline to get recommendations](https://laowantong.github.io/paroxython/user_manual/index.html#pipeline-tutorial),
+  - [prepare your program collections for better results](https://laowantong.github.io/paroxython/user_manual/index#preparing-your-program-collection),
+  - [understand and modify the taxonomic classification](https://laowantong.github.io/paroxython/user_manual/index#taxonomy),
+  - and more.
+- [Developer manual](https://laowantong.github.io/paroxython/developer_manual/index.html):
+  - [get a rough idea of the program structure and operations](https://laowantong.github.io/paroxython/developer_manual/index.html#bird-view),
+  - [use the provided helpers to contribute to the code](helper-programs),
+  - and more.
+- [Module reference](https://laowantong.github.io/paroxython/#header-submodules).
+- [Feature specifications](https://github.com/laowantong/paroxython/blob/master/paroxython/resources/spec.md): a document mixing prose, tests, regular expressions and SQL queries to describe which algorithmic features are recognized and how.
+- [User types](https://github.com/laowantong/paroxython/blob/master/paroxython/user_types.py): all objects of interest are precisely typed and checked by [mypy](http://mypy-lang.org).
 
-## Develop
-
-### Run tests
-
-```
-$ python setup.py test
-```
-
+Finally, a [battery of examples](https://github.com/laowantong/paroxython/tree/master/examples) and [comprehensive test coverage](https://github.com/laowantong/paroxython/tree/master/tests) should help answer any remaining question.
