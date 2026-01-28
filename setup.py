@@ -1,32 +1,45 @@
-from pathlib import Path
-from setuptools import setup
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+""" distribute- and pip-enabled setup.py """
 
-setup(
-    author="Eduardo Cuducos",
-    author_email="cuducos@gmail.com",
+import setuptools
+import sys
+
+import sparkdl
+
+exclude_packages = ('tests', 'tests.*')
+
+if '--with-tests' in sys.argv:
+    index = sys.argv.index('--with-tests')
+    sys.argv.pop(index)
+    exclude_packages = ()
+
+setuptools.setup(
+    name='sparkdl',
+    version=sparkdl.__version__,
+    packages=setuptools.find_packages(exclude=exclude_packages),
+    url="https://github.com/databricks/spark-deep-learning",
+    author="Weichen Xu",
+    author_email="weichen.xu@databricks.com",
+    description="Deep Learning Pipelines for Apache Spark",
+    long_description="",
     classifiers=[
-        "Development Status :: 4 - Beta",
-        "Environment :: Web Environment",
-        "Framework :: Django",
-        "Framework :: Flask",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Environment :: Console",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: Unix",
+        "Programming Language :: Python :: 3",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development",
     ],
-    description="Elm filter for webassets",
-    install_requires=["webassets"],
-    keywords=["elm", "webassets", "assets", "django", "flask"],
-    license="MIT",
-    long_description=Path("README.rst").read_text(),
-    name="webassets-elm",
-    py_modules=["webassets_elm"],
-    python_requires=">=3.5",
-    test_suite="nose.collector",
-    tests_require=["nose"],
-    url="https://github.com/cuducos/webassets-elm",
-    version="0.2.1",
+    platforms=["Linux"],
+    license="BSD",
+    keywords="spark deep learning horovod model distributed training",
+    install_requires=[],
+    extras_require={},
+    tests_require=["nose", "pytest"],
     zip_safe=False,
 )
