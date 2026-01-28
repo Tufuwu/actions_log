@@ -1,412 +1,334 @@
-<table><thead>
-  <tr>
-    <th>Linux</th>
-    <th>OS X</th>
-    <th>Windows</th>
-    <th>Coverage</th>
-    <th>Downloads</th>
-  </tr>
-</thead><tbody><tr>
-  <td colspan="2" align="center">
-    <a href="https://github.com/kaelzhang/node-ignore/actions/workflows/nodejs.yml">
-    <img
-      src="https://github.com/kaelzhang/node-ignore/actions/workflows/nodejs.yml/badge.svg"
-      alt="Build Status" /></a>
-  </td>
-  <td align="center">
-    <a href="https://ci.appveyor.com/project/kaelzhang/node-ignore">
-    <img
-      src="https://ci.appveyor.com/api/projects/status/github/kaelzhang/node-ignore?branch=master&svg=true"
-      alt="Windows Build Status" /></a>
-  </td>
-  <td align="center">
-    <a href="https://codecov.io/gh/kaelzhang/node-ignore">
-    <img
-      src="https://codecov.io/gh/kaelzhang/node-ignore/branch/master/graph/badge.svg"
-      alt="Coverage Status" /></a>
-  </td>
-  <td align="center">
-    <a href="https://www.npmjs.org/package/ignore">
-    <img
-      src="http://img.shields.io/npm/dm/ignore.svg"
-      alt="npm module downloads per month" /></a>
-  </td>
-</tr></tbody></table>
+# react-cytoscapejs
 
-# ignore
+The `react-cytoscapejs` package is an MIT-licensed [React](https://reactjs.org) component for network (or graph, as in [graph theory](https://en.wikipedia.org/wiki/Graph_theory)) visualisation. The component renders a [Cytoscape](http://js.cytoscape.org) graph.
 
-`ignore` is a manager, filter and parser which implemented in pure JavaScript according to the [.gitignore spec 2.22.1](http://git-scm.com/docs/gitignore).
-
-`ignore` is used by eslint, gitbook and [many others](https://www.npmjs.com/browse/depended/ignore).
-
-Pay **ATTENTION** that [`minimatch`](https://www.npmjs.org/package/minimatch) (which used by `fstream-ignore`) does not follow the gitignore spec.
-
-To filter filenames according to a .gitignore file, I recommend this npm package, `ignore`.
-
-To parse an `.npmignore` file, you should use `minimatch`, because an `.npmignore` file is parsed by npm using `minimatch` and it does not work in the .gitignore way.
-
-### Tested on
-
-`ignore` is fully tested, and has more than **five hundreds** of unit tests.
-
-- Linux + Node: `0.8` - `7.x`
-- Windows + Node: `0.10` - `7.x`, node < `0.10` is not tested due to the lack of support of appveyor.
-
-Actually, `ignore` does not rely on any versions of node specially.
-
-Since `4.0.0`, ignore will no longer support `node < 6` by default, to use in node < 6, `require('ignore/legacy')`. For details, see [CHANGELOG](https://github.com/kaelzhang/node-ignore/blob/master/CHANGELOG.md).
-
-## Table Of Main Contents
-
-- [Usage](#usage)
-- [`Pathname` Conventions](#pathname-conventions)
-- See Also:
-  - [`glob-gitignore`](https://www.npmjs.com/package/glob-gitignore) matches files using patterns and filters them according to gitignore rules.
-- [Upgrade Guide](#upgrade-guide)
-
-## Install
-
-```sh
-npm i ignore
-```
+Most props of this component are [Cytoscape JSON](http://js.cytoscape.org/#core/initialisation).
 
 ## Usage
 
-```js
-import ignore from 'ignore'
-const ig = ignore().add(['.abc/*', '!.abc/d/'])
+### npm
+
+```bash
+npm install react-cytoscapejs
+npm install cytoscape@3.x.y # your desired version, 3.2.19 or newer
 ```
 
-### Filter the given paths
+### yarn
 
-```js
-const paths = [
-  '.abc/a.js',    // filtered out
-  '.abc/d/e.js'   // included
-]
-
-ig.filter(paths)        // ['.abc/d/e.js']
-ig.ignores('.abc/a.js') // true
+```bash
+yarn add react-cytoscapejs
+yarn add cytoscape@3.x.y # your desired version, 3.2.19 or newer
 ```
 
-### As the filter function
+Note that you must specify the desired version of `cytoscape` to be used.  Otherwise, you will get whatever version npm or yarn thinks best matches this package's compatible semver range -- which is currently `^3.2.19` or any version of 3 newer than or equal to 3.2.19.
 
-```js
-paths.filter(ig.createFilter()); // ['.abc/d/e.js']
-```
 
-### Win32 paths will be handled
+The component is created by putting a `<CytoscapeComponent>` within the `render()` function of one of your apps's React components. Here is a minimal example:
 
-```js
-ig.filter(['.abc\\a.js', '.abc\\d\\e.js'])
-// if the code above runs on windows, the result will be
-// ['.abc\\d\\e.js']
-```
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import CytoscapeComponent from 'react-cytoscapejs';
 
-## Why another ignore?
-
-- `ignore` is a standalone module, and is much simpler so that it could easy work with other programs, unlike [isaacs](https://npmjs.org/~isaacs)'s [fstream-ignore](https://npmjs.org/package/fstream-ignore) which must work with the modules of the fstream family.
-
-- `ignore` only contains utility methods to filter paths according to the specified ignore rules, so
-  - `ignore` never try to find out ignore rules by traversing directories or fetching from git configurations.
-  - `ignore` don't cares about sub-modules of git projects.
-
-- Exactly according to [gitignore man page](http://git-scm.com/docs/gitignore), fixes some known matching issues of fstream-ignore, such as:
-  - '`/*.js`' should only match '`a.js`', but not '`abc/a.js`'.
-  - '`**/foo`' should match '`foo`' anywhere.
-  - Prevent re-including a file if a parent directory of that file is excluded.
-  - Handle trailing whitespaces:
-    - `'a '`(one space) should not match `'a  '`(two spaces).
-    - `'a \ '` matches `'a  '`
-  - All test cases are verified with the result of `git check-ignore`.
-
-# Methods
-
-## .add(pattern: string | Ignore): this
-## .add(patterns: Array<string | Ignore>): this
-
-- **pattern** `String | Ignore` An ignore pattern string, or the `Ignore` instance
-- **patterns** `Array<String | Ignore>` Array of ignore patterns.
-
-Adds a rule or several rules to the current manager.
-
-Returns `this`
-
-Notice that a line starting with `'#'`(hash) is treated as a comment. Put a backslash (`'\'`) in front of the first hash for patterns that begin with a hash, if you want to ignore a file with a hash at the beginning of the filename.
-
-```js
-ignore().add('#abc').ignores('#abc')    // false
-ignore().add('\\#abc').ignores('#abc')   // true
-```
-
-`pattern` could either be a line of ignore pattern or a string of multiple ignore patterns, which means we could just `ignore().add()` the content of a ignore file:
-
-```js
-ignore()
-.add(fs.readFileSync(filenameOfGitignore).toString())
-.filter(filenames)
-```
-
-`pattern` could also be an `ignore` instance, so that we could easily inherit the rules of another `Ignore` instance.
-
-## <strike>.addIgnoreFile(path)</strike>
-
-REMOVED in `3.x` for now.
-
-To upgrade `ignore@2.x` up to `3.x`, use
-
-```js
-import fs from 'fs'
-
-if (fs.existsSync(filename)) {
-  ignore().add(fs.readFileSync(filename).toString())
-}
-```
-
-instead.
-
-## .filter(paths: Array&lt;Pathname&gt;): Array&lt;Pathname&gt;
-
-```ts
-type Pathname = string
-```
-
-Filters the given array of pathnames, and returns the filtered array.
-
-- **paths** `Array.<Pathname>` The array of `pathname`s to be filtered.
-
-### `Pathname` Conventions:
-
-#### 1. `Pathname` should be a `path.relative()`d pathname
-
-`Pathname` should be a string that have been `path.join()`ed, or the return value of `path.relative()` to the current directory,
-
-```js
-// WRONG, an error will be thrown
-ig.ignores('./abc')
-
-// WRONG, for it will never happen, and an error will be thrown
-// If the gitignore rule locates at the root directory,
-// `'/abc'` should be changed to `'abc'`.
-// ```
-// path.relative('/', '/abc')  -> 'abc'
-// ```
-ig.ignores('/abc')
-
-// WRONG, that it is an absolute path on Windows, an error will be thrown
-ig.ignores('C:\\abc')
-
-// Right
-ig.ignores('abc')
-
-// Right
-ig.ignores(path.join('./abc'))  // path.join('./abc') -> 'abc'
-```
-
-In other words, each `Pathname` here should be a relative path to the directory of the gitignore rules.
-
-Suppose the dir structure is:
-
-```
-/path/to/your/repo
-    |-- a
-    |   |-- a.js
-    |
-    |-- .b
-    |
-    |-- .c
-         |-- .DS_store
-```
-
-Then the `paths` might be like this:
-
-```js
-[
-  'a/a.js'
-  '.b',
-  '.c/.DS_store'
-]
-```
-
-#### 2. filenames and dirnames
-
-`node-ignore` does NO `fs.stat` during path matching, so for the example below:
-
-```js
-// First, we add a ignore pattern to ignore a directory
-ig.add('config/')
-
-// `ig` does NOT know if 'config', in the real world,
-//   is a normal file, directory or something.
-
-ig.ignores('config')
-// `ig` treats `config` as a file, so it returns `false`
-
-ig.ignores('config/')
-// returns `true`
-```
-
-Specially for people who develop some library based on `node-ignore`, it is important to understand that.
-
-Usually, you could use [`glob`](http://npmjs.org/package/glob) with `option.mark = true` to fetch the structure of the current directory:
-
-```js
-import glob from 'glob'
-
-glob('**', {
-  // Adds a / character to directory matches.
-  mark: true
-}, (err, files) => {
-  if (err) {
-    return console.error(err)
+class MyApp extends React.Component {
+  constructor(props){
+    super(props);
   }
 
-  let filtered = ignore().add(patterns).filter(files)
-  console.log(filtered)
-})
+  render(){
+    const elements = [
+       { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+       { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } },
+       { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
+    ];
+
+    return <CytoscapeComponent elements={elements} style={ { width: '600px', height: '600px' } } />;
+  }
+}
+
+ReactDOM.render( React.createElement(MyApp, document.getElementById('root')));
 ```
 
-## .ignores(pathname: Pathname): boolean
+## `Basic props`
 
-> new in 3.2.0
+### `elements`
 
-Returns `Boolean` whether `pathname` should be ignored.
+The flat list of [Cytoscape elements](http://js.cytoscape.org/#notation/elements-json) to be included in the graph, each represented as non-stringified JSON. E.g.:
 
-```js
-ig.ignores('.abc/a.js')    // true
+```jsx
+<CytoscapeComponent
+  elements={[
+    { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+    { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } },
+    {
+      data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' }
+    }
+  ]}
+/>
 ```
 
-## .createFilter()
+Note that arrays or objects should not be used in an `element`'s `data` or `scratch` fields, unless using a custom `diff()` prop.
 
-Creates a filter function which could filter an array of paths with `Array.prototype.filter`.
+In order to make it easier to support passing in `elements` JSON in the `elements: { nodes: [], edges: [] }` format, there is a static function `CytoscapeComponent.normalizeElements()`.  E.g.:
 
-Returns `function(path)` the filter function.
+```jsx
+<CytoscapeComponent
+  elements={CytoscapeComponent.normalizeElements({
+    nodes: [
+      { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+      { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } }
+    ],
+    edges: [
+      {
+        data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' }
+      }
+    ]
+  })}
+/>
+```
 
-## .test(pathname: Pathname) since 5.0.0
+Note that `CytoscapeComponent.normalizeElements()` is useful only for plain-JSON data, such as an export from Cytoscape.js or the Cytoscape desktop software.  If you use [custom prop types](#custom-prop-types), such as Immutable, then you should flatten the elements yourself before passing the `elements` prop.
 
-Returns `TestResult`
+### `stylesheet`
 
-```ts
-interface TestResult {
-  ignored: boolean
-  // true if the `pathname` is finally unignored by some negative pattern
-  unignored: boolean
+The Cytoscape stylesheet as non-stringified JSON. Note that the prop key is `stylesheet` rather than `style`, the key used by Cytoscape itself, so as to not conflict with the HTML [`style`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/style) attribute. E.g.:
+
+```jsx
+<CytoscapeComponent
+  stylesheet={[
+    {
+      selector: 'node',
+      style: {
+        width: 20,
+        height: 20,
+        shape: 'rectangle'
+      }
+    },
+    {
+      selector: 'edge',
+      style: {
+        width: 15
+      }
+    }
+  ]}
+/>
+```
+
+### `layout`
+
+Use a [layout](http://js.cytoscape.org/#layouts) to automatically position the nodes in the graph. E.g.:
+
+```jsx
+layout: {
+  name: 'random';
 }
 ```
 
-- `{ignored: true, unignored: false}`: the `pathname` is ignored
-- `{ignored: false, unignored: true}`: the `pathname` is unignored
-- `{ignored: false, unignored: false}`: the `pathname` is never matched by any ignore rules.
+To use an external [layout extension](http://js.cytoscape.org/#extensions/layout-extensions), you must register the extension prior to rendering this component, e.g.:
 
-## static `ignore.isPathValid(pathname): boolean` since 5.0.0
+```jsx
+import Cytoscape from 'cytoscape';
+import COSEBilkent from 'cytoscape-cose-bilkent';
+import React from 'react';
+import CytoscapeComponent from 'react-cytoscapejs';
 
-Check whether the `pathname` is an valid `path.relative()`d path according to the [convention](#1-pathname-should-be-a-pathrelatived-pathname).
+Cytoscape.use(COSEBilkent);
 
-This method is **NOT** used to check if an ignore pattern is valid.
+class MyApp extends React.Component {
+  render() {
+    const elements = [
+      { data: { id: 'one', label: 'Node 1' }, position: { x: 0, y: 0 } },
+      { data: { id: 'two', label: 'Node 2' }, position: { x: 100, y: 0 } },
+      { data: { source: 'one', target: 'two', label: 'Edge from Node1 to Node2' } }
+    ];
+
+    const layout = { name: 'cose-bilkent' };
+
+    return <CytoscapeComponent elements={elements} layout={layout} />;
+  }
+}
+```
+
+### `cy`
+
+This prop allows for getting a reference to the Cytoscape `cy` reference using a React ref function. This `cy` reference can be used to access the Cytoscape API directly. E.g.:
+
+```jsx
+class MyApp extends React.Component {
+  render() {
+    return <CytoscapeComponent cy={(cy) => { this.cy = cy }}>;
+  }
+}
+```
+
+## Viewport manipulation
+
+### `pan`
+
+The [panning position](http://js.cytoscape.org/#init-opts/pan) of the graph, e.g. `<CytoscapeComponent pan={ { x: 100, y: 200 } } />`.
+
+### `zoom`
+
+The [zoom level](http://js.cytoscape.org/#init-opts/zoom) of the graph, e.g. `<CytoscapeComponent zoom={2} />`.
+
+## Viewport mutability & gesture toggling
+
+### `panningEnabled`
+
+Whether the [panning position of the graph is mutable overall](http://js.cytoscape.org/#init-opts/panningEnabled), e.g. `<CytoscapeComponent panningEnabled={false} />`.
+
+### `userPanningEnabled`
+
+Whether the [panning position of the graph is mutable by user gestures](http://js.cytoscape.org/#init-opts/userPanningEnabled) such as swiping, e.g. `<CytoscapeComponent userPanningEnabled={false} />`.
+
+### `minZoom`
+
+The [minimum zoom level](http://js.cytoscape.org/#init-opts/minZoom) of the graph, e.g. `<CytoscapeComponent minZoom={0.5} />`.
+
+### `maxZoom`
+
+The [maximum zoom level](http://js.cytoscape.org/#init-opts/maxZoom) of the graph, e.g. `<CytoscapeComponent maxZoom={2} />`.
+
+### `zoomingEnabled`
+
+Whether the [zoom level of the graph is mutable overall](http://js.cytoscape.org/#init-opts/zoomingEnabled), e.g. `<CytoscapeComponent zoomingEnabled={false} />`.
+
+### `userZoomingEnabled`
+
+Whether the [zoom level of the graph is mutable by user gestures](http://js.cytoscape.org/#init-opts/userZoomingEnabled) (e.g. pinch-to-zoom), e.g. `<CytoscapeComponent userZoomingEnabled={false} />`.
+
+### `boxSelectionEnabled`
+
+Whether [shift+click-and-drag box selection is enabled](http://js.cytoscape.org/#init-opts/boxSelectionEnabled), e.g. `<CytoscapeComponent boxSelectionEnabled={false} />`.
+
+### `autoungrabify`
+
+If true, nodes [automatically can not be grabbed](http://js.cytoscape.org/#init-opts/autoungrabify) regardless of whether each node is marked as grabbable, e.g. `<CytoscapeComponent autoungrabify={true} />`.
+
+### `autolock`
+
+If true, [nodes can not be moved at all](http://js.cytoscape.org/#init-opts/autolock), e.g. `<CytoscapeComponent autolock={true} />`.
+
+### `autounselectify`
+
+If true, [elements have immutable selection state](http://js.cytoscape.org/#init-opts/autounselectify), e.g. `<CytoscapeComponent autounselectify={true} />`.
+
+## HTML attribute props
+
+These props allow for setting built-in HTML attributes on the div created by the component that holds the visualisation:
+
+### `id`
+
+The [`id`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id) attribute of the div, e.g. `<CytoscapeComponent id="myCy" />`.
+
+### `className`
+
+The [`class`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class) attribute of the div containing space-separated class names, e.g. `<CytoscapeComponent className="foo bar" />`.
+
+### `style`
+
+The [`style`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/style) attribute of the div containing CSS styles, e.g. `<CytoscapeComponent style={ { width: '600px', height: '600px' } } />`.
+
+## Custom prop types
+
+This component allows for props of custom type to be used (i.e. non JSON props), for example an object-oriented model or an [Immutable](http://facebook.github.io/immutable-js/) model. The props used to control the reading and diffing of the main props are listed below.
+
+Examples are given using Immutable. Using Immutable allows for cheaper diffs, which is useful for updating graphs with many `elements`. For example, you may specify `elements` as the following:
 
 ```js
-ignore.isPathValid('./foo')  // false
+const elements = Immutable.List([
+  Immutable.Map({ data: Immutable.Map({ id: 'foo', label: 'bar' }) })
+]);
 ```
 
-## ignore(options)
+### `get(object, key)`
 
-### `options.ignorecase` since 4.0.0
-
-Similar as the `core.ignorecase` option of [git-config](https://git-scm.com/docs/git-config), `node-ignore` will be case insensitive if `options.ignorecase` is set to `true` (the default value), otherwise case sensitive.
+Get the value of the specified `object` at the `key`, which may be an integer in the case of lists/arrays or strings in the case of maps/objects. E.g.:
 
 ```js
-const ig = ignore({
-  ignorecase: false
-})
-
-ig.add('*.png')
-
-ig.ignores('*.PNG')  // false
+const get = (object, key) => {
+  // must check type because some props may be immutable and others may not be
+  if (Immutable.Map.isMap(object) || Immutable.List.isList(object)) {
+    return object.get(key);
+  } else {
+    return object[key];
+  }
+}
 ```
 
-### `options.ignoreCase?: boolean` since 5.2.0
-
-Which is alternative to `options.ignoreCase`
-
-### `options.allowRelativePaths?: boolean` since 5.2.0
-
-This option brings backward compatibility with projects which based on `ignore@4.x`. If `options.allowRelativePaths` is `true`, `ignore` will not check whether the given path to be tested is [`path.relative()`d](#pathname-conventions).
-
-However, passing a relative path, such as `'./foo'` or `'../foo'`, to test if it is ignored or not is not a good practise, which might lead to unexpected behavior
+The default is:
 
 ```js
-ignore({
-  allowRelativePaths: true
-}).ignores('../foo/bar.js') // And it will not throw
+const get = (object, key) => object[key];
 ```
 
-****
+### `toJson(object)`
 
-# Upgrade Guide
-
-## Upgrade 4.x -> 5.x
-
-Since `5.0.0`, if an invalid `Pathname` passed into `ig.ignores()`, an error will be thrown, unless `options.allowRelative = true` is passed to the `Ignore` factory.
-
-While `ignore < 5.0.0` did not make sure what the return value was, as well as
-
-```ts
-.ignores(pathname: Pathname): boolean
-
-.filter(pathnames: Array<Pathname>): Array<Pathname>
-
-.createFilter(): (pathname: Pathname) => boolean
-
-.test(pathname: Pathname): {ignored: boolean, unignored: boolean}
-```
-
-See the convention [here](#1-pathname-should-be-a-pathrelatived-pathname) for details.
-
-If there are invalid pathnames, the conversion and filtration should be done by users.
+Get the deep value of the specified `object` as non-stringified JSON. E.g.:
 
 ```js
-import {isPathValid} from 'ignore' // introduced in 5.0.0
-
-const paths = [
-  // invalid
-  //////////////////
-  '',
-  false,
-  '../foo',
-  '.',
-  //////////////////
-
-  // valid
-  'foo'
-]
-.filter(isValidPath)
-
-ig.filter(paths)
+const toJson = (object) => {
+  // must check type because some props may be immutable and others may not be
+  if (Immutable.isImmutable(object)) {
+    return object.toJSON();
+  } else {
+    return object;
+  }
+}
 ```
 
-## Upgrade 3.x -> 4.x
-
-Since `4.0.0`, `ignore` will no longer support node < 6, to use `ignore` in node < 6:
+The default is:
 
 ```js
-var ignore = require('ignore/legacy')
+const toJson = (object) => object;
 ```
 
-## Upgrade 2.x -> 3.x
+### `diff(objectA, objectB)`
 
-- All `options` of 2.x are unnecessary and removed, so just remove them.
-- `ignore()` instance is no longer an [`EventEmitter`](nodejs.org/api/events.html), and all events are unnecessary and removed.
-- `.addIgnoreFile()` is removed, see the [.addIgnoreFile](#addignorefilepath) section for details.
+Return whether the two objects have equal value. This is used to determine if and where Cytoscape needs to be patched. E.g.:
 
-****
+```js
+const diff = (objectA, objectB) => objectA !== objectB; // immutable creates new objects for each operation
+```
 
-# Collaborators
+The default is a shallow equality check over the fields of each object. This means that if you use the default `diff()`, you should not use arrays or objects in an element's `data` or `scratch` fields.
 
-- [@whitecolor](https://github.com/whitecolor) *Alex*
-- [@SamyPesse](https://github.com/SamyPesse) *Samy Pessé*
-- [@azproduction](https://github.com/azproduction) *Mikhail Davydov*
-- [@TrySound](https://github.com/TrySound) *Bogdan Chadkin*
-- [@JanMattner](https://github.com/JanMattner) *Jan Mattner*
-- [@ntwb](https://github.com/ntwb) *Stephen Edgar*
-- [@kasperisager](https://github.com/kasperisager) *Kasper Isager*
-- [@sandersn](https://github.com/sandersn) *Nathan Shively-Sanders*
+Immutable benefits performance here by reducing the total number of `diff()` calls needed. For example, an unchanged `element` requires only one diff with Immutable whereas it would require many diffs with the default JSON `diff()` implementation. Basically, Immutable make diffs minimal-depth searches.
+
+### `forEach(list, iterator)`
+
+Call `iterator` on each element in the `list`, in order. E.g.:
+
+```js
+const forEach = (list, iterator) => list.forEach(iterator); // same for immutable and js arrays
+```
+
+The above example is the same as the default `forEach()`.
+
+## Reference props
+
+### `cy()`
+
+The `cy` prop allows for getting a reference to the `cy` Cytoscape object, e.g.:
+
+```jsx
+<CytoscapeComponent cy={(cy) => { myCyRef = cy }} />
+```
+
+## Change log
+
+- v1.2.1
+  - When patching, apply layout outside of batching.
+- v1.2.0
+  - Add support for `headless`, `styleEnabled` and the following (canvas renderer) rendering hints: `hideEdgesOnViewport`, `textureOnViewport`, `motionBlur`, `motionBlurOpacity`, `wheelSensitivity`, `pixelRatio`
+  - Add setup and version explanation to README
+  - Add a default React displayName
+- v1.1.0
+  - Add `Component.normalizeElements()` utility function
+  - Update style prop docs
+- v1.0.1
+  - Update style attribute in docs example to use idiomatic React style object
+  - Add npmignore
+- v1.0.0
+  - Initial release
+  
