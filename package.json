@@ -1,42 +1,66 @@
 {
-  "name": "suchtube",
-  "version": "0.5.6",
-  "description": "YouTube search as a service, with Slack integration and CLI",
-  "bin": "bin/suchtube",
-  "main": "src/search.js",
-  "scripts": {
-    "start": "./bin/suchtube --server",
-    "dev": "nodemon --inspect ./bin/suchtube --server",
-    "test": "ava ./test/test_*.js --verbose",
-    "release:patch": "npm version patch && git push && git push --tags && npm publish",
-    "release:minor": "npm version minor && git push && git push --tags && npm publish",
-    "release:major": "npm version major && git push && git push --tags && npm publish"
+  "name": "uglifyjs-folder",
+  "description": "Run terser on a folder and minify the result in a single file",
+  "version": "3.2.0",
+  "homepage": "https://github.com/ionutvmi/uglifyjs-folder",
+  "author": {
+    "name": "Mihai Ionut Vilcu",
+    "email": "ionutvmi@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ionutvmi/uglifyjs-folder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ionutvmi/uglifyjs-folder/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/ionutvmi/uglifyjs-folder/blob/master/LICENSE-MIT"
+    }
+  ],
+  "engines": {
+    "node": ">=14"
   },
   "keywords": [
-    "slack",
-    "slack-command",
-    "youtube",
-    "search",
-    "api",
-    "service",
+    "uglify",
+    "folder",
+    "directory",
     "cli"
   ],
-  "author": "Marc Anguera Insa @markets",
-  "repository": "markets/suchtube",
-  "license": "MIT",
-  "engines": {
-    "node": ">=16.0.0"
+  "preferGlobal": true,
+  "bin": {
+    "uglifyjs-folder": "cli.js"
+  },
+  "scripts": {
+    "test": "ava --no-worker-threads",
+    "test:watch": "ava --no-worker-threads --watch",
+    "coverage": "nyc --reporter=lcov ava --no-worker-threads"
+  },
+  "ava": {
+    "files": [
+      "test/index.js",
+      "test/snapshots.js"
+    ],
+    "ignoredByWatcher": [
+      "tmp/**"
+    ],
+    "snapshotDir": "test/snapshots-data"
   },
   "dependencies": {
-    "axios": "^1.11.0",
-    "body-parser": "^1.20.3",
-    "express": "^4.21.2",
-    "open": "^10.2.0",
-    "yargs": "^17.7.2"
+    "extend": "3.0.2",
+    "globby": "11.1.0",
+    "graceful-fs": "4.2.10",
+    "meow": "9.0.0",
+    "mkdirp": "1.0.4",
+    "terser": "5.16.1"
   },
   "devDependencies": {
-    "ava": "^2.4.0",
-    "nodemon": "^3.1.10",
-    "sinon": "^19.0.5"
+    "ava": "5.1.0",
+    "del": "6.1.1",
+    "nyc": "15.1.0",
+    "proxyquire": "2.1.3",
+    "sinon": "15.0.1"
   }
 }
