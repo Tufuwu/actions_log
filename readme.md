@@ -1,87 +1,92 @@
-# redux-watch
+# PostCSS Pseudo Classes [![Build Status][ci-img]][ci]
 
-[![NPM Package](https://img.shields.io/npm/v/redux-watch.svg?style=flat-square)](https://www.npmjs.org/package/redux-watch)
-[![Build Status](https://img.shields.io/travis/jprichardson/redux-watch.svg?branch=master&style=flat-square)](https://travis-ci.org/jprichardson/redux-watch)
+[PostCSS] plugin to automatically add in companion classes
+where pseudo-selectors are used.
+This allows you to add the class name to force the styling of a pseudo-selector,
+which can be really helpful for testing or being able
+to concretely reach all style states.
 
-[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
+[PostCSS]: https://github.com/postcss/postcss
+[ci-img]:  https://travis-ci.org/giuseppeg/postcss-pseudo-classes.svg
+[ci]:      https://travis-ci.org/giuseppeg/postcss-pseudo-classes
 
-Watch/observe [Redux](http://redux.js.org/) store state changes.
+### Credits
 
-## Why?
+This plugin is a port of [rework-pseudo-classes](https://github.com/SlexAxton/rework-pseudo-classes) written by [Alex Sexton](https://twitter.com/SlexAxton).
 
-Redux provides you with a `subscribe()` method so that you can be notified when the state changes. However, it does not let you know what changed. `redux-watch` will let you know what changed.
+## Installation
 
-
-## Install
-
+```bash
+$ npm install postcss-pseudo-classes
 ```
-npm i --save redux-watch
-```
-
-## Usage
-
-`watch(getState [, objectPath [, comparison]])` -> `function`
-
-- `getState`: A `function` that is used to return the state. Also useful in conjunction with selectors.
-- `objectPath`: An **optional** `string` or `Array` that represents the path in an object. Uses [object-path](https://www.npmjs.com/package/object-path) ([mariocasciaro/object-path](https://github.com/mariocasciaro/object-path)) for value extraction.
-- `comparison`: An **optional** function to pass for comparison of the fields. Defaults to strict equal comparison (`===`).
 
 ## Example
 
-##### basic example
-
 ```js
-// ... other imports/requires
-import watch from 'redux-watch'
+var pseudoclasses = require('postcss-pseudo-classes')({
+  // default contains `:root`.
+  blacklist: [],
 
-// assuming you have an admin reducer / state slice
-console.log(store.getState().admin.name) // 'JP'
+  // (optional) create classes for a restricted list of selectors
+  // N.B. the colon (:) is optional
+  restrictTo: [':nth-child', 'hover'],
 
-// store is THE redux store
-let w = watch(store.getState, 'admin.name')
-store.subscribe(w((newVal, oldVal, objectPath) => {
-  console.log('%s changed from %s to %s', objectPath, oldVal, newVal)
-  // admin.name changed from JP to JOE
-}))
+  // default is `false`. If `true`, will output CSS
+  // with all combinations of pseudo styles/pseudo classes.
+  allCombinations: true,
 
-// somewhere else, admin reducer handles ADMIN_UPDATE
-store.dispatch({ type: 'ADMIN_UPDATE', payload: { name: 'JOE' }})
+  // default is `true`. If `false`, will generate
+  // pseudo classes for `:before` and `:after`
+  preserveBeforeAfter: false
+
+  // default is `\:`. It will be added to pseudo classes.
+  prefix: '\\:'
+});
+
+postcss([ pseudoclasses ])
+  .process(css)
+  .then(function (result) { console.log(result.css); });
 ```
 
-##### example (w/ [reselect](https://www.npmjs.com/package/reselect) ([reactjs/reselect](https://github.com/reactjs/reselect)) selectors)
+### style.css
 
-When using with selectors, you often times won't need to pass the object path. Most times the selectors will handle this for you.
-
-```js
-// ... other imports requires
-import watch from 'redux-watch'
-
-// assuming mySelector is a reselect selector defined somewhere
-let w = watch(() => mySelector(store.getState()))
-store.subscribe(w((newVal, oldVal) => {
-  console.log(newVal)
-  console.log(oldVal)
-}))
+```css
+.some-selector:hover {
+  text-decoration: underline;
+}
 ```
 
-#### Note on Comparisons.
+yields
 
-By default, `redux-watch` uses `===` (strict equal) operator to check for changes. This may not be want you want. Sometimes you may want to do a deep inspection. You should use either [deep-equal](https://www.npmjs.com/package/deep-equal) ([substack/node-deep-equal](https://github.com/substack/node-deep-equal)) or [is-equal](https://www.npmjs.com/package/is-equal) ([ljharb/is-equal](https://github.com/ljharb/is-equal)). `is-equal` is better since it supports ES6 types like Maps/Sets.
-
-##### is-equal example
-
-```js
-import isEqual from 'is-equal'
-import watch from 'redux-watch'
-
-let w = watch(store.getState, 'admin', isEqual)
-store.subscribe(w((newVal, oldVal, objectPath) => {
-  // response to changes
-}))
+```css
+.some-selector:hover,
+.some-selector.\:hover {
+  text-decoration: underline;
+}
 ```
+
+### usage
+
+```html
+<button class="some-selector :hover">howdy</button>
+```
+
+## Edge cases
+
+* This plugin escapes parenthesis so `:nth-child(5)` would look like `.class.\:nth-child\(5\)` and can be used as a regular class: `<button class=":nth-child(5)">howdy</button>`.
+* Pseudo-selectors with two colons are ignored entirely since they're a slightly different thing.
+* Chained pseudo-selectors just become chained classes: `:focus:hover` becomes `.\:focus.\:hover`.
+
+## Tests
+
+```bash
+$ npm test
+```
+
+## Contributors
+
+[@ai](https://github.com/ai)
 
 ## License
 
-MIT
-
-Copyright (c) [JP Richardson](https://github.com/jprichardson)
+(MIT)

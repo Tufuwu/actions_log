@@ -1,45 +1,36 @@
 {
-  "name": "redux-watch",
-  "version": "1.2.0",
-  "description": "Watch Redux state for changes.",
+  "name": "postcss-pseudo-classes",
+  "version": "0.4.0",
+  "description": "PostCSS plugin to convert pseudo-classes to classes for testing purposes",
   "keywords": [
-    "redux",
-    "watch",
-    "observe",
-    "monitor",
-    "notify",
-    "state",
-    "observer",
-    "watcher",
-    "react"
+    "postcss",
+    "css",
+    "postcss-plugin",
+    "css test",
+    "pseudo classes"
   ],
-  "homepage": "https://github.com/jprichardson/redux-watch#readme",
-  "bugs": {
-    "url": "https://github.com/jprichardson/redux-watch/issues"
-  },
+  "author": "Giuseppe Gurgone",
   "license": "MIT",
-  "author": "JP Richardson",
-  "files": [
-    "index.js"
-  ],
-  "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jprichardson/redux-watch.git"
+    "url": "git+https://github.com/giuseppeg/postcss-pseudo-classes.git"
   },
-  "scripts": {
-    "lint": "standard",
-    "test": "npm run lint && npm run unit",
-    "unit": "tape test/*.js | tap-spec"
+  "bugs": {
+    "url": "https://github.com/giuseppeg/postcss-pseudo-classes/issues"
   },
-  "dependencies": {
-    "object-path": "^0.11.5"
+  "homepage": "https://github.com/giuseppeg/postcss-pseudo-classes",
+  "peerDependencies": {
+    "postcss": "^8.0.0"
   },
   "devDependencies": {
-    "redux": "^3.0.5",
-    "reselect": "^2.0.1",
-    "standard": "7.x",
-    "tap-spec": "^4.1.1",
-    "tape": "^4.5.1"
-  }
+    "ava": "^2.0.0",
+    "eslint": "^6.0.0",
+    "postcss": "^8.4.31"
+  },
+  "scripts": {
+    "test": "ava test/test.js && eslint *.js test/*.js"
+  },
+  "files": [
+    "index.js"
+  ]
 }
