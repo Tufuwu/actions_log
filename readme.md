@@ -1,51 +1,117 @@
-# A-Frame Inspector
+# karma-jsdom-launcher
 
-A visual inspector tool for [A-Frame](https://aframe.io) scenes. Just hit
-`<ctrl> + <alt> + i` on any A-Frame scene to open up the Inspector.
+> Launcher for [jsdom].
 
-- [Documentation / Guide](https://aframe.io/docs/master/introduction/visual-inspector-and-dev-tools.html)
-- [Example](https://aframe.io/aframe-inspector/examples/)
-
-Also check out:
-
-- [A-Frame Watcher](https://github.com/supermedium/aframe-watcher) - Companion server to sync changes to HTML files.
-
-![Inspector Preview](https://user-images.githubusercontent.com/674727/50159991-fa540c80-028c-11e9-87f1-72c54e08d808.png)
-
-## Using the Inspector
-
-### Keyboard Shortcut
-
-A-Frame comes with a **keyboard shortcut** to inject the inspector. Just open
-up any A-Frame scene (running at least A-Frame v0.3.0) and press **`<ctrl> +
-<alt> + i`** to inject the inspector, just like you would use a DOM inspector:
-
-### Specifying Inspector Build
-
-This is done with the `inspector` component. By default, this is set on the
-scene already. If we want, we can specify a specific build of the Inspector to
-inject by passing a URL. For debugging:
-
-```html
-<a-scene inspector="url: http://localhost:3333/dist/aframe-inspector.js">
-  <!-- Scene... -->
-</a-scene>
-```
-
-To use the master branch of the Inspector:
-
-```html
-<a-scene inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
-</a-scene>
-```
-
-## Local Development
+## Installation
 
 ```bash
-git clone git@github.com:aframevr/aframe-inspector.git
-cd aframe-inspector
-npm install
-npm start
+npm install karma-jsdom-launcher --save-dev
 ```
 
-Then navigate to __[http://localhost:3333/examples/](http://localhost:3333/examples/)__
+*NOTE:* karma and jsdom are peerDependencies of this module. If you haven't install them, run
+
+```bash
+npm install karma-jsdom-launcher jsdom karma --save-dev
+```
+
+to install all your dependencies.
+
+## Configuration
+```js
+// karma.conf.js
+module.exports = function(config) {
+  config.set({
+    browsers: ['jsdom'],
+  });
+};
+```
+
+You can pass list of browsers as a CLI argument too:
+```bash
+karma start --browsers jsdom
+```
+
+You can pass options directly to jsdom as shown below. See jsdom's own
+documentation for all supported options.
+
+```js
+// karma.conf.js
+const jsdom = require("jsdom");
+
+module.exports = function(config) {
+  config.set({
+    browsers: ['jsdom'],
+
+    jsdomLauncher: {
+      jsdom: {
+        resources: new jsdom.ResourceLoader({
+          userAgent: "foobar",
+        })
+      }
+    }
+  });
+};
+```
+
+## FAQ
+
+### I am using Gulp and the test suite is not exiting
+
+This occurs due to lingering event handlers and it is currently an [unsolved
+issue][issue-4]. Meanwhile you have to explicitly exit the process yourself.
+This can be done by not passing a callback to Karma.Server or by invoking
+process.exit(), as shown below.
+
+```javascript
+var gulp = require('gulp');
+var Server = require('karma').Server;
+
+gulp.task('test', function () {
+  new Server({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }).start();
+});
+```
+
+```javascript
+var gulp = require('gulp');
+var Server = require('karma').Server;
+
+gulp.task('test', function (done) {
+  new Server({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, function (exitCode) {
+    done();
+    process.exit(exitCode);
+  }).start();
+});
+```
+
+### I am using Angular CLI and the test suite hangs indefinitely
+
+You might experience a [known issue][issue-27] where Karma attempts to perform
+a synchronous request, resulting in a deadlock. Disable use of source-maps in
+your tests, as shown below.
+
+```
+// angular.json
+
+{
+  ...
+        "test": {
+          "options": {
+            "sourceMap": false
+
+```
+
+----
+
+For more information on Karma see the [homepage].
+
+
+[homepage]: http://karma-runner.github.com
+[jsdom]: https://github.com/tmpvar/jsdom
+[issue-4]: https://github.com/badeball/karma-jsdom-launcher/issues/4
+[issue-27]: https://github.com/badeball/karma-jsdom-launcher/issues/27
