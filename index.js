@@ -1,72 +1,129 @@
-var jsdom = require("jsdom");
+const alwaysLowercase = [
+	'a',
+	'an',
+	'and',
+	'at',
+	'but',
+	'by',
+	'for',
+	'in',
+	'nor',
+	'of',
+	'on',
+	'or',
+	'so',
+	'the',
+	'to',
+	'up',
+	'yet',
+	'v',
+	'v.',
+	'vs',
+	'vs.'
+];
 
-function assign (destination, source) {
-  for (var key in source) {
-    if (source.hasOwnProperty(key)) {
-      destination[key] = source[key];
-    }
-  }
+const containers = new Set(['(', '[', '{', '"', `'`, '_']);
 
-  return destination;
+const isEmail = /.+@.+\..+/;
+const isFilePath = /^(\/[\w.]+)+/;
+const isFileName = /^\w+\.\w{1,3}$/;
+const hasInternalCapital = /(?![‑–—-])[a-z]+[A-Z].*/;
+const hasHyphen = /[‑–—-]/g;
+
+function isUrl(url) {
+	try {
+		const parsed = new URL(url);
+		return Boolean(parsed.hostname);
+	} catch {
+		return false;
+	}
 }
 
-var jsdomBrowser = function (baseBrowserDecorator, config) {
-  baseBrowserDecorator(this);
+function capitalize(string) {
+	if (string.length === 0) {
+		return string;
+	}
 
-  var self = this;
-  
-  this.name = "jsdom";
+	const letters = [...string];
+	const firstLetter = letters.shift();
 
-  this._start = function (url) {
-    self.window = null;
+	if (containers.has(firstLetter)) {
+		return `${firstLetter}${capitalize(letters)}`;
+	}
 
-    if (jsdom.JSDOM) { // Indicate jsdom >= 10.0.0 and a new API
-      var virtualConsole = new jsdom.VirtualConsole();
-      virtualConsole.sendTo(console);
-      virtualConsole.removeAllListeners("clear");
+	return `${firstLetter.toUpperCase()}${letters.join('')}`;
+}
 
-      var jsdomOptions = {
-        resources: "usable",
-        runScripts: "dangerously",
-        virtualConsole: virtualConsole
-      };
+export default function titleCase(
+	string = '',
+	{ excludedWords = [], useDefaultExcludedWords = true, preserveWhitespace = false } = {}
+) {
+	if (string.toUpperCase() === string) {
+		string = string.toLowerCase();
+	}
 
-      if (config && config.jsdom) {
-        jsdomOptions = assign(jsdomOptions, config.jsdom);
-      }
+	if (useDefaultExcludedWords) {
+		excludedWords.push(...alwaysLowercase);
+	}
 
-      jsdom.JSDOM.fromURL(url, jsdomOptions).then(function (dom) {
-        self.window = dom.window;
-      });
-    } else {
-      var jsdomOptions = {
-        url: url,
-        features : {
-          FetchExternalResources: ["script", "iframe"],
-          ProcessExternalResources: ["script"]
-        },
-        created: function (error, window) {
-          self.window = window;
-        }
-      }
+	const words = string.trim().split(/(\s+)/);
 
-      if (config && config.jsdom) {
-        jsdomOptions = assign(jsdomOptions, config.jsdom);
-      }
+	const capitalizedWords = words.map((word, index, array) => {
+		if (/\s+/.test(word)) {
+			return preserveWhitespace ? word : ' ';
+		}
 
-      jsdom.env(jsdomOptions);
-    }
-  };
+		if (
+			isEmail.test(word) ||
+			isUrl(word) ||
+			isFilePath.test(word) ||
+			isFileName.test(word) ||
+			hasInternalCapital.test(word)
+		) {
+			return word;
+		}
 
-  this.on("kill", function (done) {
-    self.window && self.window.close();
-    self.emit("done");
-    process.nextTick(done);
-  });
-};
+		const hyphenMatch = word.match(hasHyphen);
 
-jsdomBrowser.$inject = ["baseBrowserDecorator", "config.jsdomLauncher"];
+		if (hyphenMatch) {
+			const isMultiPart = hyphenMatch.length > 1;
+			const [hyphenCharacter] = hyphenMatch;
 
-module.exports = {
-  "launcher:jsdom": ["type", jsdomBrowser]
-};
+			return word
+				.split(hyphenCharacter)
+				.map((subWord) => {
+					if (isMultiPart && excludedWords.includes(subWord.toLowerCase())) {
+						return subWord;
+					}
+
+					return capitalize(subWord);
+				})
+				.join(hyphenCharacter);
+		}
+
+		if (word.includes('/')) {
+			return word
+				.split('/')
+				.map((part) => capitalize(part))
+				.join('/');
+		}
+
+		const isFirstWord = index === 0;
+		const isLastWord = index === words.length - 1;
+		const previousWord = index > 1 ? array[index - 2] : '';
+		const startOfSubPhrase = index > 1 && previousWord.endsWith(':');
+
+		if (
+			!isFirstWord &&
+			!isLastWord &&
+			!startOfSubPhrase &&
+			excludedWords.includes(word.toLowerCase())
+		) {
+			return word.toLowerCase();
+		}
+
+		return capitalize(word);
+	});
+
+	return capitalizedWords.join('');
+}
