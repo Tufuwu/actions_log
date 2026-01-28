@@ -1,29 +1,33 @@
----
 name: CI
+
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
+  pull_request:
+
 jobs:
-  test:
-    name: Run unit tests
+  unit:
+    name: "Py:${{ matrix.python-version }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ["3.8", "3.9", "3.10"]
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v2
+      - name: Install Python
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: python -m pip install .[docs,test]
+      - name: Install tox
+        run: pip install tox
 
       - name: Run unit tests
-        run: make check
-
-      - name: Build docs
-        run: rst2html.py README.rst README.html
+        run: tox -e py
