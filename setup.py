@@ -1,35 +1,59 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from setuptools import setup
+"""The setup script."""
 
-readme = open('README.rst').read()
+from setuptools import setup, find_packages
 
-setup(name='RPLCD',
-      version='1.3.1',
-      description='A Raspberry Pi LCD library for the widely used Hitachi HD44780 controller.',
-      long_description=readme,
-      author='Danilo Bargen',
-      author_email='mail@dbrgn.ch',
-      url='https://github.com/dbrgn/RPLCD',
-      license='MIT',
-      keywords='raspberry, raspberry pi, lcd, liquid crystal, hitachi, hd44780',
-      packages=['RPLCD', 'RPLCD.codecs', 'RPLCD_Tests'],
-      entry_points={
-          'console_scripts': ['rplcd-tests=RPLCD_Tests.entrypoint:run'],
-      },
-      platforms=['any'],
-      python_requires='>=3.4',
-      classifiers=[
-          'Development Status :: 5 - Production/Stable',
-          'Environment :: Other Environment',
-          'Intended Audience :: Developers',
-          'License :: OSI Approved :: MIT License',
-          'Operating System :: POSIX',
-          'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.4',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-          'Topic :: System :: Hardware :: Hardware Drivers',
-          'Topic :: Software Development :: Libraries :: Python Modules',
-      ],
-    )
+with open("README.rst") as readme_file:
+    readme = readme_file.read()
+
+with open("HISTORY.rst") as history_file:
+    history = history_file.read()
+
+requirements = [
+    "django>=2",
+]
+
+setup_requirements = [
+    "pytest-runner",
+]
+
+test_requirements = [
+    "pytest",
+]
+
+setup(
+    author="Daniel Hepper",
+    author_email="daniel@consideratecode.com",
+    classifiers=[
+        "Development Status :: 2 - Pre-Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Framework :: Django",
+    ],
+    description="The Django Model Path Converter package dynamically creates custom path converters for you models.",
+    install_requires=requirements,
+    license="MIT license",
+    long_description=readme + "\n\n" + history,
+    include_package_data=True,
+    keywords="django-model-path-converter",
+    name="django-model-path-converter",
+    packages=find_packages(include=["model_path_converter"]),
+    setup_requires=setup_requirements,
+    test_suite="tests",
+    tests_require=test_requirements,
+    url="https://github.com/dhepper/django-model-path-converter",
+    version="0.1.0",
+    zip_safe=False,
+)
