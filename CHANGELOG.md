@@ -1,32 +1,55 @@
-# `node-ignore` 5 ChangeLog
+# Changelog
 
-# 5.x
+## v4.0.0
 
-## 2018-08-14, Version 5.0.1
+### Features
+- Update `KR` zipcode regex [@rpaasche](https://github.com/rpaasche)
 
-- **PATCH**: fixes for windows.
-- **PATCH**: improves tests for typescript and windows.
+### Miscellaneous
+- Update dev dependencies
 
-## 2018-08-13, Version 5.0.0
 
-- **SEMVER-MAJOR**: [#20](https://github.com/kaelzhang/node-ignore/issues/20): it will throw if an invalid pathname passes into `.ignores(pathname)`, see [Upgrade 4.x -> 5.x](https://github.com/kaelzhang/node-ignore#upgrade-4x---5x).
-- **FEATURE**: [#31](https://github.com/kaelzhang/node-ignore/issues/31): adds a new method [`.test(pathname)`](https://github.com/kaelzhang/node-ignore#testpathname-pathname-since-500).
-- **BENCHMARK**: improves performance by 26%.
+## v3.1.0
 
-# 4.x
+### Features
+- Set back `GB` country code to be [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) compliant. `UK` country code will fallback to `GB` for backward compatibility [@jariz](https://github.com/jariz)
+- Update `IE` zipcode regex [@jariz](https://github.com/jariz)
 
-## 2018-08-12, Version 4.0.6
+### Miscellaneous
+- Update dev dependencies
+- Add code coverage
+- Add tests
+- Add `build` NPM script
+- Setup Travis CI for PR and remote branches
+- Setup CD to publish package on new releases
+- Keep only useful files for package (reduce package size)
 
-- **PATCH**: `Object.prototype` methods will not ruin the result any more.
 
-## ~ 2018-08-09, Version 4.0.1 - 4.0.5
+## v3.0.0
 
-- **PATCH**: updates README.md about frequent asked quesions from github issues.
+### Features
+- ⚠️ Remove [obsolete](https://en.wikipedia.org/wiki/ISO_3166-2:CS) **CS** code (Serbia and Montenegro). Use **RS** (Serbia) & **ME** (Montenegro) that already exist in the lib.
 
-## 2018-06-22, Version 4.0.0
+### Miscellaneous
+- Update README
 
-- **SEMVER-MAJOR**: Drop support for node < 6 by default.
-- **FEATURE**: supports the missing character ranges and sets, such as `*.[a-z]` and `*.[jJ][pP][gG]`
-- **FEATURE**: new option: `ignorecase` to make `ignore` case insensitive.
-- **FEATURE**: supports question mark which matches a single character.
-- **PATCH**: fixes typescript declaration.
+
+## v2.0.0
+
+### Features
+- ⚠️ Replace **GB** by **UK**
+- Update **UK** Regex (ex **GB**) to cover all **UK** zipcodes
+- Add **CO** (Colombia) support
+
+### Miscellaneous
+- Update dependencies
+- Add a header prefix on dist files to identify lib and version
+
+
+## v1.0.3 (from v1.0.0)
+
+### Miscellaneous
+- Add MIT License
+- Add manual test HTML file
+- Update dependencies
+- Update node versions on travis.yml
