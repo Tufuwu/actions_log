@@ -1,36 +1,67 @@
 {
-  "name": "postcss-pseudo-classes",
-  "version": "0.4.0",
-  "description": "PostCSS plugin to convert pseudo-classes to classes for testing purposes",
-  "keywords": [
-    "postcss",
-    "css",
-    "postcss-plugin",
-    "css test",
-    "pseudo classes"
-  ],
-  "author": "Giuseppe Gurgone",
-  "license": "MIT",
+  "name": "wait-on",
+  "description": "wait-on is a cross platform command line utility and Node.js API which will wait for files, ports, sockets, and http(s) resources to become available",
+  "version": "8.0.0",
+  "main": "lib/wait-on",
+  "bin": {
+    "wait-on": "bin/wait-on"
+  },
+  "author": "Jeff Barczewski <info@codewinds.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/giuseppeg/postcss-pseudo-classes.git"
+    "url": "http://github.com/jeffbski/wait-on.git"
   },
   "bugs": {
-    "url": "https://github.com/giuseppeg/postcss-pseudo-classes/issues"
+    "url": "http://github.com/jeffbski/wait-on/issues"
   },
-  "homepage": "https://github.com/giuseppeg/postcss-pseudo-classes",
-  "peerDependencies": {
-    "postcss": "^8.0.0"
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint \"lib/**/*.js\" \"test/**/*.js\" \"bin/wait-on\"",
+    "publish:next": "npm publish --tag next && npm view",
+    "test": "mocha --exit 'test/**/*.mocha.js'"
+  },
+  "engines": {
+    "node": ">=12.0.0"
   },
   "devDependencies": {
-    "ava": "^2.0.0",
-    "eslint": "^6.0.0",
-    "postcss": "^8.4.31"
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-chai-friendly": "^0.7.2",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.2.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "expect-legacy": "^1.20.2",
+    "mkdirp": "^1.0.4",
+    "mocha": "^10.7.3",
+    "temp": "^0.9.4"
   },
-  "scripts": {
-    "test": "ava test/test.js && eslint *.js test/*.js"
+  "dependencies": {
+    "axios": "^1.7.4",
+    "joi": "^17.13.3",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.8",
+    "rxjs": "^7.8.1"
   },
-  "files": [
-    "index.js"
+  "keywords": [
+    "wait",
+    "delay",
+    "cli",
+    "files",
+    "tcp",
+    "ports",
+    "sockets",
+    "http",
+    "exist",
+    "ready",
+    "available",
+    "portable",
+    "cross-platform",
+    "unix",
+    "linux",
+    "windows",
+    "win32",
+    "osx"
   ]
 }
