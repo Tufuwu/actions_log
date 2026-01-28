@@ -1,20 +1,23 @@
-# Python
+*.coverage
+*test_net_cached.pb
+*.class
+*.log
 *.pyc
-.eggs/
-webassets_elm.egg-info/
+python/.setup.sh
+build/*.jar
+
+docs/build
+
+# python
+*.pyc
+docs/_build/
 build/
 dist/
+*.egg-info/
 
-# Elm
-elm-stuff/
-node_modules/
 
-# Python third-party packages
-.coverage
-.python-version
-.tox
-cover/
+# intellij
+.idea/
 
-# OS, IDE & editor
+# MacOS
 .DS_Store
-.ropeproject/
