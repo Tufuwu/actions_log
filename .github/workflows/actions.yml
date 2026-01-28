@@ -2,24 +2,24 @@ name: CI
 
 on:
   push:
-    branches: ['main']
+    branches: [main]
   pull_request:
-    types: [opened, synchronize]
+    branches: [main]
 
 jobs:
-  Unit:
-    name: Unit Tests
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     strategy:
-      fail-fast: false
       matrix:
-        node-version:
-          - 22
-          - 20
+        node-version: [6.x, 8.x, 10.x]
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
+      - run: npm install
       - run: npm test

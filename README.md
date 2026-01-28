@@ -1,60 +1,99 @@
-Class.extend
-============
+# multiblob
 
-Backbone like `.extend` inheritance helper for Node.js
+A content-addressable-store that supports multiple hashing algorithms,
+and pull-streams.
 
-Usage
-------------
+## example
 
-You basically got two options:
+``` js
+var Blobs = require('multiblob')
 
-``` javascript
-// 1. Extend from the blank class
-const Base = require('class-extend');
-const Sub = Base.extend();
+var blobs = Blobs({ dir: '/media/blobCollection' })
 
-// 2. Add the .extend helper to a class
-MyClass.extend = require('class-extend').extend;
+pull(
+  source, // a buffer stream e.g. from pull-file
+  blobs.add(function (err, hash) {
+    console.log('added source to blobs:', hash)
+  })
+)
 ```
 
-#### `.extend()`
+## API
 
-`.extend` allow you to assign prototype and static methods.
+### Blobs(config) => blobs
 
-If no `constructor` method is assigned, the parent constructor method will be called by default.
+where config is an Object with properties:
+- `dir` _String_ - the directory to store blobs in
+- `alg` _String_ (optional) - the algorithm for hashing. Valid options: `'blake2s'`, `'sha256'` (default: `'blake2s'`)
+- `encode` _Function_ (optional) - converts a buffer to a string (default: see `util.js#encode`)
+- `decode` _Function_ (optional) - recovers a string into an object `{ hash: Buffer, alg }` (default: see `util.js#decode`)
+- `isHash` _Function_ (optional) - tests a string to check if it's a valid hash (default: see `util.js#isHash`)
 
-``` javascript
-// Extend a class
-const Sub = Parent.extend({
-  // Overwrite the default constructor
-  constructor() {},
+### blobs.add (hash?, cb?) => Sink
 
-  // Sub class prototypes methods
-  hello() { console.log('hello'); }
-}, {
-  // Constructor static methods
-  hey() { console.log('hey'); }
-});
+Create a sink stream for writing a blob.
+Expects to receive a buffer stream.
 
-Sub.hey();
-// LOG: hey
+If `hash` was given, then it will error if the file turned out to be different.
+If a `cb` is not given and there was an error, this function will throw.
 
-const instance = new Sub();
-instance.hello();
-// LOG: hello
-```
+### blobs.get (hash || opts) => Source
 
-#### `.__super__`
+Takes the hash of blob already in the store and return a source buffer stream.
+If the file does not exist this stream will error.
 
-Sub classes are assigned a `__super__` static property pointing to their parent prototype.
+If the argument is a `hash` string, then return the stream.
+If the argument is an `opts` object, with the `key: hash` property,
+retrive that blob, but error if the size does not exactly match the
+`size` property, or is over `max` property (in bytes)
 
-``` javascript
-const Sub = Parent.extend();
-assert(Sub.__super__ === Parent.prototype);
-```
+### blobs.getSlice(opts) => Source
 
-License
----------------
+create a source stream that reads a slice of a given blob,
+from the `start` property to the `end` property, in bytes.
+Error if the file does not exist or if
+the size of the whole blob does not exactly match the
+`size` property, or is over `max` property (in bytes).
 
-Copyright (c) 2025 Simon Boudrias  
-Licensed under the MIT license.
+### blobs.has(hash, cb)
+
+check if the given hash is in the store.
+If `hash` is an array of hashes,
+`size` will callback with an array of booleans.
+
+### blobs.size(hash, cb)
+
+get the size of this blob. If `hash` is an array of hashes,
+`size` will callback with an array of sizes.
+If the hash does not exist in the store, `size` will callback `null`.
+
+
+### blobs.ls() => Source
+
+source stream that reads the list of hashes available in the store.
+
+### blobs.rm(hash, cb)
+
+remove a hash from the store.
+
+### blobs.isEmptyHash(hash)
+
+Check if a given hash is actually the empty hash. If something has the empty hash,
+that is probably a bug. The above methods will act like the empty file is already in the store.
+
+### blobs.meta
+
+???
+
+### blobs.resolve
+
+???
+
+
+## todo
+
+maybe emit events when blobs are stored?
+
+## License
+
+MIT
