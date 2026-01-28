@@ -1,44 +1,55 @@
 {
-  "name": "check-engine",
-  "version": "1.11.0",
-  "description": "A system version checker in Node.js",
-  "main": "./lib/checkSystem.js",
-  "bin": {
-    "check-engine": "./bin/check-engine.js"
-  },
-  "scripts": {
-    "start": "node bin/check-engine.js",
-    "test": "tape lib/*.spec.js | tap-min",
-    "lint": "./node_modules/.bin/eslint bin/**/*.js lib/**/*.js"
-  },
+  "name": "pa11y-dashboard",
+  "version": "4.2.0",
+  "private": true,
+  "description": "Pa11y Dashboard is a visual web interface to the Pa11y accessibility reporter",
+  "keywords": [
+    "accessibility",
+    "analysis",
+    "report"
+  ],
+  "author": "Team Pa11y",
+  "contributors": [
+    "Perry Harlock (http://www.phwebs.co.uk/)",
+    "Rowan Manning (http://rowanmanning.com/)"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mohlsen/check-engine.git"
+    "url": "https://github.com/pa11y/dashboard.git"
   },
-  "keywords": [
-    "node"
-  ],
-  "author": "Mike Ohlsen",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mohlsen/check-engine/issues"
-  },
-  "homepage": "https://github.com/mohlsen/check-engine#readme",
+  "homepage": "https://github.com/pa11y/dashboard",
+  "bugs": "https://github.com/pa11y/dashboard/issues",
+  "license": "GPL-3.0",
   "engines": {
-    "node": ">=10"
+    "node": ">=12 <16"
   },
   "dependencies": {
-    "bluebird": "3.7.2",
-    "colors": "1.4.0",
-    "command-line-usage": "6.1.3",
-    "jsonfile": "6.1.0",
-    "semver": "7.5.4",
-    "yargs": "17.7.1"
+    "body-parser": "~1.19.2",
+    "compression": "~1.7.4",
+    "express": "~4.17.3",
+    "express-hbs": "~2.4.0",
+    "http-headers": "~3.0.2",
+    "kleur": "~4.1.4",
+    "moment": "~2.29.1",
+    "morgan": "~1.10.0",
+    "nanoid": "~3.3.2",
+    "pa11y-webservice": "~4.0.1",
+    "pa11y-webservice-client-node": "~3.0.0",
+    "underscore": "~1.13.2"
   },
   "devDependencies": {
-    "eslint": "8.35.0",
-    "proxyquire": "2.1.3",
-    "tap-min": "2.0.0",
-    "tape": "5.6.3"
+    "bower": "^1.8.13",
+    "cheerio": "^1.0.0-rc.10",
+    "eslint": "^7.27.0",
+    "less": "^3.11.1",
+    "mocha": "^8.4.0",
+    "pa11y-lint-config": "^2.0.0",
+    "proclaim": "^3.6.0",
+    "request": "^2.88.2",
+    "uglify-js": "^3.11.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "make ci"
   }
 }
