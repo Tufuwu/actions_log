@@ -1,39 +1,24 @@
-name: BamBam
-
+name: build
 on: [push, pull_request]
-
-permissions:
-  contents: read
-
 jobs:
-  checks:
-
-    runs-on: ubuntu-latest
+  test:
     strategy:
       matrix:
-        python-version: ["3.8", "3.9"]
-
+        python-version: [3.8, 3.9]
+      fail-fast: false
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
-
-    - name: Smoke test import
-      run: |
-        python -c 'import bambam'
-
-    - name: Lint with flake8
-      run: |
-        flake8 . --show-source --statistics
-
-    - name: Lint with autopep8
-      run: |
-        autopep8 -d *.py | awk 'BEGIN{had_data=0}{print;had_data=1}END{exit had_data}'
+    # Tests
+    - run: python test_PDDL.py
+    - run: python test_planner.py
+    # Examples
+    - run: python action.py
+    - run: python PDDL.py    examples/dinner/dinner.pddl examples/dinner/pb1.pddl
+    - run: python planner.py examples/dinner/dinner.pddl examples/dinner/pb1.pddl
+    - run: python planner.py examples/airport/airport.pddl examples/airport/pb1.pddl
