@@ -1,103 +1,97 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Copyright 2015-2020 grafana-dashboard-builder contributors
+# coding=utf-8
+# Copyright (c) 2016, Cedric Zhuang
+# All rights reserved.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of disclaimer nor the names of its contributors may
+#       be used to endorse or promote products derived from this software
+#       without specific prior written permission.
 #
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from __future__ import unicode_literals
-
-import sys
+# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE REGENTS AND CONTRIBUTORS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
+import io
+import re
+import os
 
-__author__ = 'Jakub Plichta <jakub.plichta@gmail.com>'
-
-
-class Tox(TestCommand):
-    user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.tox_args = None
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import tox
-        import shlex
-
-        args = self.tox_args
-        if args:
-            args = shlex.split(self.tox_args)
-        errno = tox.cmdline(args=args)
-        sys.exit(errno)
+__author__ = 'Cedric Zhuang'
 
 
-params = {
-    'name': 'grafana-dashboard-builder',
-    'version': '0.7.0a3',
-    'packages': [
-        'grafana_dashboards',
-        'grafana_dashboards.client',
-        'grafana_dashboards.components'
+def version():
+    desc = get_long_description()
+    ret = re.findall(r'VERSION: (.*)', desc)[0]
+    return ret.strip()
+
+
+def here(filename=None):
+    ret = os.path.abspath(os.path.dirname(__file__))
+    if filename is not None:
+        ret = os.path.join(ret, filename)
+    return ret
+
+
+def read(*filenames, **kwargs):
+    encoding = kwargs.get('encoding', 'utf-8')
+    sep = kwargs.get('sep', '\n\n')
+    buf = []
+    for filename in filenames:
+        with io.open(here(filename), encoding=encoding) as f:
+            buf.append(f.read())
+    return sep.join(buf)
+
+
+def read_requirements(filename):
+    with open(filename) as f:
+        return f.read().splitlines()
+
+
+def get_long_description():
+    filename = 'README.md'
+    return read(filename)
+
+
+setup(
+    name="stockstats",
+    version=version(),
+    author="Cedric Zhuang",
+    author_email="jealous@163.com",
+    description="DataFrame with inline stock statistics support.",
+    license="BSD",
+    keywords="stock statistics indicator",
+    url="https://github.com/jealous/stockstats",
+    py_modules=['stockstats'],
+    platforms=['any'],
+    long_description=get_long_description(),
+    classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Natural Language :: English",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Financial and Insurance Industry",
+        "Operating System :: OS Independent",
+        "Development Status :: 4 - Beta",
+        "Topic :: Utilities",
+        "License :: OSI Approved :: BSD License",
     ],
-    'scripts': [
-        'bin/grafana_dashboard_builder.py'
-    ],
-    'url': 'https://github.com/jakubplichta/grafana-dashboard-builder',
-    'license': 'Apache License, Version 2.0',
-    'author': 'Jakub Plichta',
-    'author_email': 'jakub.plichta@gmail.com',
-    'description': 'Generate Grafana dashboards with YAML',
-    'classifiers': [
-        'Topic :: Utilities',
-        'Environment :: Console',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Information Technology',
-        'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-    ],
-    'keywords': 'grafana yaml graphite prometheus influxdb',
-    'cmdclass': {'test': Tox},
-    'tests_require': ['tox', 'mock'],
-    'install_requires': ['PyYAML>=5.3', 'argparse', 'requests-kerberos', 'requests'],
-    'python_requires': '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*',
-    'entry_points': {
-        'console_scripts': [
-            'grafana-dashboard-builder = grafana_dashboards.cli:main',
-        ],
-    },
-    'long_description':
-        """grafana-dashboard-builder is an open-source tool for easier creation of Grafana dashboards.
-It is written in Python and uses YAML descriptors for dashboard
-templates.
-
-This project has been inspired by Jenkins Job Builder that
-allows users to describe Jenkins jobs with human-readable format. grafana-dashboard-builder
-aims to provide similar simplicity to Grafana dashboard creation and to give users easy way how they can create
-dashboard templates filled with different configuration."""
-}
-
-setup(**params)
+    install_requires=read_requirements('requirements.txt'),
+    tests_require=read_requirements('test-requirements.txt'),
+    long_description_content_type='text/markdown',
+)
