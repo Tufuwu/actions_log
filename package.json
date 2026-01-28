@@ -1,67 +1,35 @@
 {
-  "name": "megajs",
-  "version": "0.17.2",
-  "description": "Unofficial JavaScript SDK for MEGA",
-  "main": "dist/main.node-cjs.js",
-  "exports": {
-    "node": {
-      "require": "./dist/main.node-cjs.js",
-      "import": "./dist/main.node-es.js"
-    },
-    "default": {
-      "require": "./dist/main.browser-cjs.js",
-      "import": "./dist/main.browser-es.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/qgustavor/mega.git"
-  },
+  "name": "dotenv-safe",
+  "version": "8.2.1",
+  "description": "Load environment variables from .env and ensure they are defined",
   "keywords": [
-    "mega",
-    "storage"
-  ],
-  "scripts": {
-    "build": "node build",
-    "test": "npm run lint && ava",
-    "lint": "standard",
-    "lint-fix": "standard --fix",
-    "dist": "npm run test && npm run build"
-  },
-  "standard": {
-    "ignore": [
-      "dist"
-    ]
-  },
-  "author": "Tõnis Tiigi <tonistiigi@gmail.com>",
-  "contributors": [
-    "Gustavo Rodrigues (https://qgustavor.tk)"
+    "dotenv"
   ],
   "license": "MIT",
-  "dependencies": {
-    "abort-controller": "^3.0.0",
-    "combined-stream": "^1.0.8",
-    "node-fetch": "^2.6.7",
-    "secure-random": "^1.1.2",
-    "stream-combiner": "^0.2.2",
-    "stream-skip": "^1.0.3",
-    "through": "^2.1.0"
+  "author": "Rodrigo López Dato <rolodato@rolodato.com>",
+  "files": [
+    "index.js",
+    "config.js",
+    "MissingEnvVarsError.js"
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rolodato/dotenv-safe.git"
+  },
+  "scripts": {
+    "pretest": "eslint index.js config.js MissingEnvVarsError.js test/.",
+    "test": "cross-env HELLO=fromTheOtherSide mocha"
+  },
+  "peerDependencies": {
+    "dotenv": ">= 8.2.0"
   },
   "devDependencies": {
-    "ava": "^4.0.1",
-    "buffer": "^6.0.3",
-    "core-js": "^3.20.3",
-    "esbuild": "^0.14.11",
-    "esbuild-plugin-alias": "^0.2.1",
-    "events": "^3.3.0",
-    "mega-mock": "^0.3.0",
-    "readable-stream": "^3.6.0",
-    "regenerator-runtime": "^0.13.9",
-    "standard": "^16.0.4",
-    "tmp": "0.0.33",
-    "util": "^0.12.4"
+    "chai": "^4.2.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^6.8.0",
+    "fs-extra": "^9.0.0",
+    "lodash.clonedeep": "^4.5.0",
+    "mocha": "^10.2.0"
   }
 }
