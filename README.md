@@ -1,63 +1,43 @@
-![PyTeal logo](https://github.com/algorand/pyteal/blob/master/docs/pyteal.png?raw=true)
+[![Build Status](https://app.travis-ci.com/CodeReclaimers/neat-python.svg?branch=master)](https://app.travis-ci.com/github/CodeReclaimers/neat-python)
+[![Coverage Status](https://coveralls.io/repos/CodeReclaimers/neat-python/badge.svg?branch=master&service=github)](https://coveralls.io/github/CodeReclaimers/neat-python?branch=master)
+[![Downloads](https://static.pepy.tech/personalized-badge/neat-python?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads)](https://pepy.tech/project/neat-python)
 
+## About ##
 
-# PyTeal: Algorand Smart Contracts in Python
+NEAT (NeuroEvolution of Augmenting Topologies) is a method developed by Kenneth O. Stanley for evolving arbitrary neural
+networks. This project is a pure-Python implementation of NEAT with no dependencies beyond the standard library. It was
+forked from the excellent project by @MattKallada.
 
-[![Build Status](https://travis-ci.com/algorand/pyteal.svg?branch=master)](https://travis-ci.com/algorand/pyteal)
-[![PyPI version](https://badge.fury.io/py/pyteal.svg)](https://badge.fury.io/py/pyteal)
-[![Documentation Status](https://readthedocs.org/projects/pyteal/badge/?version=latest)](https://pyteal.readthedocs.io/en/latest/?badge=latest)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+For further information regarding general concepts and theory, please see the [publications page](https://www.kenstanley.net/papers) of Stanley's current website.
 
-PyTeal is a Python language binding for [Algorand Smart Contracts (ASC1s)](https://developer.algorand.org/docs/features/asc1/). 
+`neat-python` is licensed under the [3-clause BSD license](https://opensource.org/licenses/BSD-3-Clause).  It is
+currently only supported on Python 3.6 through 3.14, and pypy3.
 
-Algorand Smart Contracts are implemented using a new language that is stack-based, 
-called [Transaction Execution Approval Language (TEAL)](https://developer.algorand.org/docs/features/asc1/teal/). 
+## Getting Started ##
 
-However, TEAL is essentially an assembly language. With PyTeal, developers can express smart contract logic purely using Python. 
-PyTeal provides high level, functional programming style abstractions over TEAL and does type checking at construction time.
+If you want to try neat-python, please check out the repository, start playing with the examples (`examples/xor` is
+a good place to start) and then try creating your own experiment.
 
-### Install 
+The documentation is available on [Read The Docs](http://neat-python.readthedocs.io).
 
-PyTeal requires Python version >= 3.6.
+## Citing ##
 
-#### Recommended: Install from PyPi
+Here are APA and Bibtex entries you can use to cite this project in a publication. The listed authors are the originators
+and/or maintainers of all iterations of the project up to this point.  If you have contributed and would like your name added 
+to the citation, please submit an issue or email alan@codereclaimers.com.
 
-Install the latest official release from PyPi:
+APA
+```
+McIntyre, A., Kallada, M., Miguel, C. G., Feher de Silva, C., & Netto, M. L. neat-python [Computer software]
+```
 
-* `pip install pyteal`
+Bibtex
+```
+@software{McIntyre_neat-python,
+author = {McIntyre, Alan and Kallada, Matt and Miguel, Cesar G. and Feher de Silva, Carolina and Netto, Marcio Lobo},
+title = {{neat-python}}
+}
+```
 
-#### Install Latest Commit
-
-If needed, it's possible to install directly from the latest commit on master to use unreleased features:
-
-> **WARNING:** Unreleased code is experimental and may not be backwards compatible or function properly. Use extreme caution when installing PyTeal this way.
-
-* `pip install git+https://github.com/algorand/pyteal`
-
-### Documentation
-
-[PyTeal Docs](https://pyteal.readthedocs.io/)
-
-### Development Setup
-
-Setup venv (one time):
- * `python3 -m venv venv`
-
-Active venv:
- * `. venv/bin/activate` (if your shell is bash/zsh)
- * `. venv/bin/activate.fish` (if your shell is fish)
-
-Pip install PyTeal in editable state
- * `pip install -e .`
-
-Install dependencies:
-* `pip install -r requirements.txt`
- 
-Type checking using mypy:
-* `mypy pyteal`
-
-Run tests:
-* `pytest`
-
-Format code:
-* `black .`
+## Thank you! ##
+Many thanks to the folks who have [cited this repository](https://scholar.google.com/scholar?start=0&hl=en&as_sdt=5,34&sciodt=0,34&cites=15315010889003730796&scipsc=) in their own work. 
