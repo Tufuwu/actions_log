@@ -1,6 +1,1 @@
-black==21.7b0
-mypy==0.910
-pytest
-pytest-timeout
-py-algorand-sdk
-click<8.1.0
+virtualenv==1.9.1
