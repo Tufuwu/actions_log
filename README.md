@@ -1,43 +1,64 @@
-[![Build Status](https://app.travis-ci.com/CodeReclaimers/neat-python.svg?branch=master)](https://app.travis-ci.com/github/CodeReclaimers/neat-python)
-[![Coverage Status](https://coveralls.io/repos/CodeReclaimers/neat-python/badge.svg?branch=master&service=github)](https://coveralls.io/github/CodeReclaimers/neat-python?branch=master)
-[![Downloads](https://static.pepy.tech/personalized-badge/neat-python?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads)](https://pepy.tech/project/neat-python)
+# Intercept Redirect
 
-## About ##
+[![Intercept Redirect Logo](https://raw.githubusercontent.com/bjornstar/intercept-redirect/master/assets/icon-300.png)](https://intercept-redirect.bjornstar.com)
 
-NEAT (NeuroEvolution of Augmenting Topologies) is a method developed by Kenneth O. Stanley for evolving arbitrary neural
-networks. This project is a pure-Python implementation of NEAT with no dependencies beyond the standard library. It was
-forked from the excellent project by @MattKallada.
+[![Travis CI](https://travis-ci.org/bjornstar/intercept-redirect.svg?branch=master)](https://travis-ci.org/bjornstar/intercept-redirect)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/9qrj76bt914531gg/branch/master?svg=true)](https://ci.appveyor.com/project/bjornstar/intercept-redirect/branch/master)
+[![CircleCI](https://circleci.com/gh/bjornstar/intercept-redirect/tree/master.svg?style=svg)](https://circleci.com/gh/bjornstar/intercept-redirect/tree/master)
 
-For further information regarding general concepts and theory, please see the [publications page](https://www.kenstanley.net/papers) of Stanley's current website.
+[![AMO Badge](https://img.shields.io/amo/v/intercept-redirect)](https://intercept-redirect.firefox.bjornstar.com)
+[![CWS Badge](https://img.shields.io/chrome-web-store/v/kdjmiebhgaleboaamnehjbamlghkoedf)](https://intercept-redirect.chrome.bjornstar.com)
 
-`neat-python` is licensed under the [3-clause BSD license](https://opensource.org/licenses/BSD-3-Clause).  It is
-currently only supported on Python 3.6 through 3.14, and pypy3.
+Skip tracking redirects that serve no purpose other than to waste your valuable time.
 
-## Getting Started ##
+This extension does not modify any of the pages that you visit. Its sole purpose is to intercept network requests intended for redirect services. It requests the bare minimum of access to these domains to protect your privacy and have the best performance.
 
-If you want to try neat-python, please check out the repository, start playing with the examples (`examples/xor` is
-a good place to start) and then try creating your own experiment.
+## Supported Domains
+- c212.net
+- *.curseforge.com
+- clickserve.dartsearch.net
+- github-redirect.dependabot.com
+- *.digidip.net
+- disq.us
+- cj.dotomi.com
+- console.ebsta.com
+- redirect.epicgames.com
+- exit.sc
+- facebook.com
+- l.facebook.com
+- lm.facebook.com
+- m.facebook.com
+- gate.sc
+- www.google.co.jp
+- news.url.google.com
+- plus.url.google.com
+- www.google.com
+- www.google.se
+- www.googleadservices.com
+- href.li
+- l.instagram.com
+- www.javlibrary.com
+- r.klar.na
+- www.kraken.com
+- t.lever-analytics.com
+- www.linkedin.com
+- l.messenger.com
+- outgoing.prod.mozaws.net
+- onlyfans.com
+- *.safelinks.protection.outlook.com
+- slack-redir.net
+- steamcommunity.com
+- twitter.com
+- t.umblr.com
+- vk.com
+- workable.com
+- www.youtube.com
 
-The documentation is available on [Read The Docs](http://neat-python.readthedocs.io).
+## Installation
 
-## Citing ##
+Intercept Redirect is available for the following browsers:
 
-Here are APA and Bibtex entries you can use to cite this project in a publication. The listed authors are the originators
-and/or maintainers of all iterations of the project up to this point.  If you have contributed and would like your name added 
-to the citation, please submit an issue or email alan@codereclaimers.com.
-
-APA
-```
-McIntyre, A., Kallada, M., Miguel, C. G., Feher de Silva, C., & Netto, M. L. neat-python [Computer software]
-```
-
-Bibtex
-```
-@software{McIntyre_neat-python,
-author = {McIntyre, Alan and Kallada, Matt and Miguel, Cesar G. and Feher de Silva, Carolina and Netto, Marcio Lobo},
-title = {{neat-python}}
-}
-```
-
-## Thank you! ##
-Many thanks to the folks who have [cited this repository](https://scholar.google.com/scholar?start=0&hl=en&as_sdt=5,34&sciodt=0,34&cites=15315010889003730796&scipsc=) in their own work. 
+- Mozilla Firefox - https://intercept-redirect.firefox.bjornstar.com
+- Microsoft Edge - https://intercept-redirect.edge.bjornstar.com
+- Opera - https://intercept-redirect.opera.bjornstar.com
+- Google Chrome - https://intercept-redirect.chrome.bjornstar.com
