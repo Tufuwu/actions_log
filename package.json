@@ -1,37 +1,28 @@
 {
-  "name": "multiblob",
-  "description": "",
-  "version": "1.13.7",
-  "homepage": "https://github.com/dominictarr/multiblob",
+  "name": "yesno",
+  "version": "0.4.0",
+  "description": "A simple library for asking boolean questions in cli programs",
+  "main": "yesno.js",
+  "types": "yesno.d.ts",
+  "scripts": {
+    "test": "tap --no-cov --no-coverage-report test/index.js"
+  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/dominictarr/multiblob.git"
+    "url": "https://github.com/tcql/node-yesno.git"
   },
-  "dependencies": {
-    "blake2s": "^1.0.1",
-    "cont": "^1.0.1",
-    "explain-error": "^1.0.1",
-    "mkdirp": "^0.5.0",
-    "pull-catch": "^1.0.0",
-    "pull-defer": "^0.2.2",
-    "pull-file": "^1.0.0",
-    "pull-glob": "~1.0.6",
-    "pull-live": "^1.0.0",
-    "pull-notify": "^0.1.1",
-    "pull-paramap": "^1.2.2",
-    "pull-stream": "^3.6.2",
-    "pull-write-file": "^0.2.1",
-    "rimraf": "^2.2.8",
-    "stream-to-pull-stream": "^1.7.2"
-  },
+  "keywords": [
+    "cli",
+    "confirm",
+    "yesno",
+    "yes or no",
+    "prompt",
+    "question"
+  ],
+  "author": "Tim Channell",
+  "license": "BSD",
   "devDependencies": {
-    "tape": "^4.0.3",
-    "osenv": "^0.1.0"
+    "tap": "^16.3.0"
   },
-  "scripts": {
-    "prepublish": "npm ls &&  npm test",
-    "test": "set -e; for t in test/*.js; do node $t; done"
-  },
-  "author": "Dominic Tarr <dominic.tarr@gmail.com> (http://dominictarr.com)",
-  "license": "MIT"
+  "dependencies": {}
 }

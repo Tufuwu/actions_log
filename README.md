@@ -1,99 +1,87 @@
-# multiblob
+A nodejs library for issuing and handling responses to yes/no questions 
 
-A content-addressable-store that supports multiple hashing algorithms,
-and pull-streams.
+[![CI](https://github.com/tcql/node-yesno/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/tcql/node-yesno/actions/workflows/main.yml)
 
-## example
 
-``` js
-var Blobs = require('multiblob')
+Supports Node 8+.
 
-var blobs = Blobs({ dir: '/media/blobCollection' })
+### Installation
 
-pull(
-  source, // a buffer stream e.g. from pull-file
-  blobs.add(function (err, hash) {
-    console.log('added source to blobs:', hash)
-  })
-)
+```bash
+npm install yesno
 ```
 
-## API
+### Usage
 
-### Blobs(config) => blobs
+```javascript
+import yesno from 'yesno';        // modern es modules approach
 
-where config is an Object with properties:
-- `dir` _String_ - the directory to store blobs in
-- `alg` _String_ (optional) - the algorithm for hashing. Valid options: `'blake2s'`, `'sha256'` (default: `'blake2s'`)
-- `encode` _Function_ (optional) - converts a buffer to a string (default: see `util.js#encode`)
-- `decode` _Function_ (optional) - recovers a string into an object `{ hash: Buffer, alg }` (default: see `util.js#decode`)
-- `isHash` _Function_ (optional) - tests a string to check if it's a valid hash (default: see `util.js#isHash`)
+// *OR*
 
-### blobs.add (hash?, cb?) => Sink
+const yesno = require('yesno');   // commonjs approach
+```
 
-Create a sink stream for writing a blob.
-Expects to receive a buffer stream.
-
-If `hash` was given, then it will error if the file turned out to be different.
-If a `cb` is not given and there was an error, this function will throw.
-
-### blobs.get (hash || opts) => Source
-
-Takes the hash of blob already in the store and return a source buffer stream.
-If the file does not exist this stream will error.
-
-If the argument is a `hash` string, then return the stream.
-If the argument is an `opts` object, with the `key: hash` property,
-retrive that blob, but error if the size does not exactly match the
-`size` property, or is over `max` property (in bytes)
-
-### blobs.getSlice(opts) => Source
-
-create a source stream that reads a slice of a given blob,
-from the `start` property to the `end` property, in bytes.
-Error if the file does not exist or if
-the size of the whole blob does not exactly match the
-`size` property, or is over `max` property (in bytes).
-
-### blobs.has(hash, cb)
-
-check if the given hash is in the store.
-If `hash` is an array of hashes,
-`size` will callback with an array of booleans.
-
-### blobs.size(hash, cb)
-
-get the size of this blob. If `hash` is an array of hashes,
-`size` will callback with an array of sizes.
-If the hash does not exist in the store, `size` will callback `null`.
+### Examples
 
 
-### blobs.ls() => Source
+##### basic
 
-source stream that reads the list of hashes available in the store.
+```javascript
+const ok = await yesno({
+    question: 'Are you sure you want to continue?'
+});
+````
 
-### blobs.rm(hash, cb)
+yesno accepts `yes`, `y` , `no`, and `n` values by default.
 
-remove a hash from the store.
-
-### blobs.isEmptyHash(hash)
-
-Check if a given hash is actually the empty hash. If something has the empty hash,
-that is probably a bug. The above methods will act like the empty file is already in the store.
-
-### blobs.meta
-
-???
-
-### blobs.resolve
-
-???
+All yesno responses are case insensitive.
 
 
-## todo
+##### Custom Yes/No values
 
-maybe emit events when blobs are stored?
+```javascript
+const ok = await yesno({
+    question: 'Dude, Is this groovy or what?',
+    yesValues: [ 'groovy' ],
+    noValues: [ 'or what', 'nah' ]
+});
 
-## License
+console.log(ok ? 'Tubular.' : 'Aw, why you gotta be like that?');
+```
 
-MIT
+Now the question only responds to `groovy` as yes and `or what` as no.
+
+
+##### No default value
+
+Sometimes you may want to ensure the user didn't accidentally accept a default.
+You can disable the default response by passing null as the defaultValue parameter.
+
+```javascript
+const ok = await yesno({
+    question: 'Are you sure you want to 'rm-rf /' ?',
+    defaultValue: null
+});
+```
+
+
+##### Handling invalid responses
+
+By default, if the user enters a value that isn't recognized as an acceptable response, it will
+print out a message like: 
+
+    Invalid response.
+    Answer either yes : (yes, y)
+    Or no : (no, n)
+
+and re-ask the question. If you want to change this behavior, you can set the invalid handler before asking your question:
+
+```javascript
+const ok = await yesno({
+    question: 'Ready to continue?',
+    invalid: function ({ question, defaultValue, yesValues, noValues }) {
+        process.stdout.write("\n Whoa. That was not a good answer. Well. No more tries for you.");
+        process.exit(1);
+    }
+});
+```
