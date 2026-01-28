@@ -10,17 +10,18 @@ BUILDDIR      = build
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 # the i18n builder cannot share the environment and doctrees with the others
-I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 
-.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
+.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp \
+	epub latex latexpdf text man changes linkcheck doctest gettext \
+	apidocs
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
-	@echo "  clean      to remove genrated output"
+	@echo "  apidocs    to generate API documentation from the docstrings"
 	@echo "  html       to make standalone HTML files"
-	@echo "  notebooks   to make the Jupyter notebook-based tutorials"
 	@echo "  dirhtml    to make HTML files named index.html in directories"
 	@echo "  singlehtml to make a single large HTML file"
 	@echo "  pickle     to make pickle files"
@@ -41,13 +42,10 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
 clean:
-	-rm -rf $(BUILDDIR)/*
-	-rm -rf examples/*
-	-rm -rf generated/*
+	-rm -rf $(BUILDDIR)/* apidocs
 
-notebooks:
-
-	make -C tutorial notebooks
+apidocs:
+	pydoctor ../peekaboo ../*.py ../bin/*.py
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
@@ -85,17 +83,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/lyman.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/Peekaboo.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/lyman.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/Peekaboo.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/lyman"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/lyman"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/Peekaboo"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/Peekaboo"
 	@echo "# devhelp"
 
 epub:
@@ -159,11 +157,3 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
-
-upload:
-	rsync -azP $(BUILDDIR)/html/ mwaskom@cardinal.stanford.edu:WWW/software/seaborn
-	@echo "Uploaded to Stanford webspace"
-
-upload-dev:
-	rsync -azP $(BUILDDIR)/html/ mwaskom@cardinal.stanford.edu:WWW/software/seaborn-dev
-	@echo "Uploaded to Stanford webspace (development page)"
