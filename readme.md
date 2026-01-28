@@ -1,93 +1,109 @@
+## NodeJS SQL DDL Synchronization
 
-# wildcard
+[![Build Status](https://secure.travis-ci.org/dresende/node-sql-ddl-sync.png?branch=master)](http://travis-ci.org/dresende/node-sql-ddl-sync)
+[![](https://badge.fury.io/js/sql-ddl-sync.png)](https://npmjs.org/package/sql-ddl-sync)
+[![](https://gemnasium.com/dresende/node-sql-ddl-sync.png)](https://gemnasium.com/dresende/node-sql-ddl-sync)
 
-Very simple wildcard matching, which is designed to provide the same
-functionality that is found in the
-[eve](https://github.com/adobe-webplatform/eve) eventing library.
+## Install
 
+```sh
+npm install sql-ddl-sync
+```
 
-[![NPM](https://nodei.co/npm/wildcard.png)](https://nodei.co/npm/wildcard/)
+## Dialects
 
-[![stable](https://img.shields.io/badge/stability-stable-green.svg)](https://github.com/dominictarr/stability#stable) 
+- MySQL
+- PostgreSQL
+- SQLite
 
-## Usage
+## About
 
-It works with strings:
+This module is part of [ORM](http://dresende.github.com/node-orm2). It's used synchronize model tables in supported dialects.
+Sorry there is no API documentation for now but there are a couple of tests you can read and find out how to use it if you want.
+
+## Example
+
+Install `orm` & the required driver (eg: `mysql`).
+Create a file with the contents below and change insert your database credentials.
+Run once and you'll see table `ddl_sync_test` appear in your database. Then make some changes to it (add/drop/change columns)
+and run the code again. Your table should always return to the same structure.
 
 ```js
-var wildcard = require('wildcard');
+var orm   = require("orm");
+var mysql = require("mysql");
+var Sync  = require("sql-ddl-sync").Sync;
 
-console.log(wildcard('foo.*', 'foo.bar'));
-// --> true
+orm.connect("mysql://username:password@localhost/database", function (err, db) {
+	if (err) throw err;
+	var driver = db.driver;
 
-console.log(wildcard('foo.*', 'foo'));
-// --> true
+	var sync = new Sync({
+		dialect : "mysql",
+		driver  : driver,
+		debug   : function (text) {
+			console.log("> %s", text);
+		}
+	});
+
+	sync.defineCollection("ddl_sync_test", {
+    id     : { type: "serial", key: true, serial: true },
+    name   : { type: "text", required: true },
+    age    : { type: "integer" },
+    male   : { type: "boolean" },
+    born   : { type: "date", time: true },
+    born2  : { type: "date" },
+    int2   : { type: "integer", size: 2 },
+    int4   : { type: "integer", size: 4 },
+    int8   : { type: "integer", size: 8 },
+    float4 : { type: "number",  size: 4 },
+    float8 : { type: "number",  size: 8 },
+    photo  : { type: "binary" }
+  });
+
+	sync.sync(function (err) {
+		if (err) {
+			console.log("> Sync Error");
+			console.log(err);
+		} else {
+			console.log("> Sync Done");
+		}
+		process.exit(0);
+	});
+});
 
 ```
 
-Arrays:
+## PostgreSQL UUID
 
 ```js
-var wildcard = require('wildcard');
-var testdata = [
-  'a.b.c',
-  'a.b',
-  'a',
-  'a.b.d'
-];
-
-console.log(wildcard('a.b.*', testdata));
-// --> ['a.b.c', 'a.b', 'a.b.d']
-
+{ type: 'uuid', defaultExpression: 'uuid_generate_v4()' }
 ```
 
-Objects (matching against keys):
+## Test
 
-```js
-var wildcard = require('wildcard');
-var testdata = {
-  'a.b.c' : {},
-  'a.b'   : {},
-  'a'     : {},
-  'a.b.d' : {}
-};
+To test, first make sure you have development dependencies installed. Go to the root folder and do:
 
-console.log(wildcard('a.*.c', testdata));
-// --> { 'a.b.c': {} }
-
+```sh
+npm install
 ```
 
-## Alternative Implementations
+Then, just run the tests.
 
-- <https://github.com/isaacs/node-glob>
+```sh
+npm test
+```
 
-  Great for full file-based wildcard matching.
+If you have a supported database server and want to test against it, first install the module:
 
-- <https://github.com/sindresorhus/matcher>
+```sh
+# if you have a mysql server
+npm install mysql
+# if you have a postgresql server
+npm install pg
+```
 
-   A well cared for and loved JS wildcard matcher.
+And then run:
 
-## License(s)
-
-### MIT
-
-Copyright (c) 2023 Damon Oehlman <damon.oehlman@gmail.com>
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```sh
+node test/run-db --uri 'mysql://username:password@localhost/database'
+```
