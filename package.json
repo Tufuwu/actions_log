@@ -1,44 +1,49 @@
 {
-  "name": "i18n-zipcodes",
-  "version": "4.0.0",
-  "description": "International zipcodes validator based on Regex for Node.js and the browser.",
-  "keywords": [
-    "i18n",
-    "zipcode",
-    "validator",
-    "international",
-    "regex"
-  ],
-  "author": "Benjamin Blonde",
-  "license": "MIT",
+  "name": "winston-daily-rotate-file",
+  "version": "4.6.0",
+  "description": "A transport for winston which logs to a rotating file each day.",
   "main": "index.js",
+  "types": "index.d.ts",
+  "engines": {
+    "node": ">=12"
+  },
   "scripts": {
-    "build": "gulp",
-    "test": "nyc --reporter=text --reporter=lcov mocha",
-    "codecov": "npx codecov"
+    "test": "mocha --ignore **/*.worker.js && eslint .",
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sarcadass/i18n-zipcodes.git"
+    "url": "git@github.com:winstonjs/winston-daily-rotate-file.git"
   },
-  "directories": {
-    "test": "test"
-  },
-  "files": [
-    "lib/*",
-    "dist/*"
+  "keywords": [
+    "winston",
+    "daily-rotate-file",
+    "log-rotate",
+    "logrotate"
   ],
-  "dependencies": {},
+  "author": "Charlie Robbins <charlie.robbins@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/winstonjs/winston-daily-rotate-file/issues"
+  },
+  "homepage": "https://github.com/winstonjs/winston-daily-rotate-file#readme",
+  "peerDependencies": {
+    "winston": "^3"
+  },
   "devDependencies": {
-    "array-uniq": "^3.0.0",
-    "browserify": "^17.0.0",
-    "chai": "^4.3.4",
-    "gulp": "^4.0.2",
-    "gulp-header": "^2.0.9",
-    "gulp-rename": "^2.0.0",
-    "gulp-uglify": "^3.0.2",
-    "mocha": "^9.0.0",
-    "nyc": "^15.1.0",
-    "vinyl-source-stream": "^2.0.0"
+    "chai": "4.2.0",
+    "eslint": "^8.5.0",
+    "eslint-plugin-node": "^11.1.0",
+    "mocha": "^9.1.3",
+    "moment": "^2.29.1",
+    "rimraf": "^3.0.2",
+    "threads": "^1.7.0"
+  },
+  "dependencies": {
+    "file-stream-rotator": "^0.6.1",
+    "object-hash": "^2.0.1",
+    "triple-beam": "^1.3.0",
+    "winston-transport": "^4.4.0"
   }
 }
