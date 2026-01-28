@@ -1,49 +1,13 @@
-.. _installation:
+Install PyTeal
+==============
 
-============
-Installation
-============
+The easiest way of installing PyTeal is using :code:`pip` : ::
 
-PyPHER works both with Python 2.7 and 3.4 or later
+  $ pip3 install pyteal
 
-.. _`pypi install`:
+Alternatively, choose a `distribution file <https://pypi.org/project/pyteal/#files>`_, and run ::
 
-Option 1: `Pip`_
-================
+  $ pip3 install [file name]
 
-.. code:: bash
 
-    $ pip install pypher
 
-.. _`source install`:
-
-Option 2: from source_
-======================
-
-.. code:: bash
-
-    $ git clone https://git.ias.u-psud.fr/aboucaud/pypher.git
-    $ cd pypher
-    $ python setup.py install
-
-Dependencies
-============
-
-``pypher`` needs the following Python libraries to be installed:
-
-* numpy_ (>=1.7.2)
-* scipy_ (>=0.9.0)
-* astropy_ (>=0.4)
-
-In case these are not automatically installed using the `pypi install`_
-procedure, either install them manually or use the ``requirements.txt`` file provided with the `source install`_ and simply:
-
-.. code:: bash
-
-    $ pip install -r requirements.txt
-
-.. _Pip: https://pypi.python.org/pypi/pypher
-.. _source: https://git.ias.u-psud.fr/aboucaud/pypher/
-.. _numpy: http://www.numpy.org/
-.. _scipy: http://www.scipy.org/
-.. _astropy: http://www.astropy.org/
