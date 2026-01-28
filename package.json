@@ -1,35 +1,34 @@
 {
-  "name": "dotenv-safe",
-  "version": "8.2.1",
-  "description": "Load environment variables from .env and ensure they are defined",
+  "name": "universalify",
+  "version": "2.0.0",
+  "description": "Make a callback- or promise-based function support both promises and callbacks.",
   "keywords": [
-    "dotenv"
+    "callback",
+    "native",
+    "promise"
   ],
+  "homepage": "https://github.com/RyanZim/universalify#readme",
+  "bugs": "https://github.com/RyanZim/universalify/issues",
   "license": "MIT",
-  "author": "Rodrigo López Dato <rolodato@rolodato.com>",
+  "author": "Ryan Zimmerman <opensrc@ryanzim.com>",
   "files": [
-    "index.js",
-    "config.js",
-    "MissingEnvVarsError.js"
+    "index.js"
   ],
-  "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/rolodato/dotenv-safe.git"
+    "url": "git+https://github.com/RyanZim/universalify.git"
   },
   "scripts": {
-    "pretest": "eslint index.js config.js MissingEnvVarsError.js test/.",
-    "test": "cross-env HELLO=fromTheOtherSide mocha"
-  },
-  "peerDependencies": {
-    "dotenv": ">= 8.2.0"
+    "test": "standard && nyc --reporter text --reporter lcovonly tape test/*.js | colortape"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "cross-env": "^7.0.3",
-    "eslint": "^6.8.0",
-    "fs-extra": "^9.0.0",
-    "lodash.clonedeep": "^4.5.0",
-    "mocha": "^10.2.0"
+    "colortape": "^0.1.2",
+    "coveralls": "^3.0.1",
+    "nyc": "^15.0.0",
+    "standard": "^14.3.1",
+    "tape": "^5.0.1"
+  },
+  "engines": {
+    "node": ">= 10.0.0"
   }
 }
