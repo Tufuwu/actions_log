@@ -1,27 +1,18 @@
-name: Tests
-
-on: [push, pull_request]
-
-permissions:
-  contents: read
-
+on: [push]
+name: tests
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8"]
-
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: checkout
+        uses: actions/checkout@v2
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+          submodules: "recursive"
+      - name: pip
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
-      - name: Run tests
+          pip install codecov
+          pip install coverage
+      - name: test
         run: |
-          make ci-test
+          coverage run jsn.py -i example.jsn -o test.json -I import_dir
+          codecov
