@@ -1,39 +1,51 @@
-# OpenSeadragon
+# A-Frame Inspector
 
-<!-- [![Gitter][gitter-badge]][gitter]
-[![Build Status][build-badge]][build] -->
+A visual inspector tool for [A-Frame](https://aframe.io) scenes. Just hit
+`<ctrl> + <alt> + i` on any A-Frame scene to open up the Inspector.
 
-An open-source, web-based viewer for zoomable images, implemented in pure JavaScript.
+- [Documentation / Guide](https://aframe.io/docs/master/introduction/visual-inspector-and-dev-tools.html)
+- [Example](https://aframe.io/aframe-inspector/examples/)
 
-See it in action and get started using it at [https://openseadragon.github.io/][openseadragon].
+Also check out:
 
-## Stable Builds
+- [A-Frame Watcher](https://github.com/supermedium/aframe-watcher) - Companion server to sync changes to HTML files.
 
-See the [GitHub releases page][github-releases].
+![Inspector Preview](https://user-images.githubusercontent.com/674727/50159991-fa540c80-028c-11e9-87f1-72c54e08d808.png)
 
-## Development
+## Using the Inspector
 
-If you want to use OpenSeadragon in your own projects, you can find the latest stable build, API documentation, and example code at [https://openseadragon.github.io/][openseadragon]. If you want to modify OpenSeadragon and/or contribute to its development, read the [contributing guide][github-contributing] for instructions.
+### Keyboard Shortcut
 
-## License
+A-Frame comes with a **keyboard shortcut** to inject the inspector. Just open
+up any A-Frame scene (running at least A-Frame v0.3.0) and press **`<ctrl> +
+<alt> + i`** to inject the inspector, just like you would use a DOM inspector:
 
-OpenSeadragon is released under the New BSD license. For details, see the [LICENSE.txt file][github-license].
+### Specifying Inspector Build
 
-[openseadragon]: https://openseadragon.github.io/
-<!-- [gitter-badge]: https://badges.gitter.im/Join%20Chat.svg
-[gitter]: https://gitter.im/openseadragon/openseadragon?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[build-badge]: https://secure.travis-ci.org/openseadragon/openseadragon.png?branch=master
-[build]: https://travis-ci.org/openseadragon/openseadragon -->
-[github-releases]: https://github.com/openseadragon/openseadragon/releases
-[github-contributing]: https://github.com/openseadragon/openseadragon/blob/master/CONTRIBUTING.md
-[github-license]: https://github.com/openseadragon/openseadragon/blob/master/LICENSE.txt
+This is done with the `inspector` component. By default, this is set on the
+scene already. If we want, we can specify a specific build of the Inspector to
+inject by passing a URL. For debugging:
 
-## Sponsors
+```html
+<a-scene inspector="url: http://localhost:3333/dist/aframe-inspector.js">
+  <!-- Scene... -->
+</a-scene>
+```
 
-We are grateful for the (development or financial) contribution to the OpenSeadragon project.
+To use the master branch of the Inspector:
 
-<a href="https://www.bbmri-eric.eu"><img alt="BBMRI ERIC Logo" src="assets/logos/bbmri-logo.png" height="70" /></a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://www.pitt.edu/"><img alt="University of Pittsburgh Logo" src="assets/logos/pitt-logo.png" height="70" /></a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://www.stanford.edu/"><img alt="Stanford University Logo" src="assets/logos/stanford-logo.png" height="70" /></a>
+```html
+<a-scene inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+</a-scene>
+```
+
+## Local Development
+
+```bash
+git clone git@github.com:aframevr/aframe-inspector.git
+cd aframe-inspector
+npm install
+npm start
+```
+
+Then navigate to __[http://localhost:3333/examples/](http://localhost:3333/examples/)__

@@ -1,37 +1,34 @@
-name: 'Pull Request Checks'
-
+name: Test Cases
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
   pull_request:
-    paths:
-      - 'src/**'
-      - 'test/**'
-      - 'images/**'
-      - '.github/workflows/prs.yml'
-      - '*.json'
-      - '*.js'
-      - '*.css'
-      - '!test/demo/**'
-
+    branches:
+      - main
+permissions:
+  contents: read
 jobs:
-  run_checks:
-    name: Run test tasks
+  test:
+    name: Test Cases
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    strategy:
+      matrix:
+        node-version: ['16.x']
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repo
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v4
+      - name: Use Node.js ${{ matrix['node-version'] }}
+        uses: actions/setup-node@v3
         with:
-          cache: npm
-          cache-dependency-path: package.json
-          node-version: lts/*
+          node-version: ${{ matrix['node-version'] }}
 
-      - name: Setup environment and install dependencies
-        run: |
-          npm install -g grunt-cli
-          npm ci
+      - name: Install dependencies
+        run: npm install
 
-      - name: Run tests
-        run: |
-          npm run test
+      - name: Check Build
+        run: npm run dist
+
+      - name: Test Cases
+        run: npm run test:ci
