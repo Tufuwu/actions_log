@@ -1,31 +1,61 @@
-.coveralls.yml
-docs/_build/**
-_build/**
-cover
-.coverage
-neat-checkpoint-*
-fitness_history.csv
-speciation.csv
-species_fitness.csv
-.mypy_cache
+# test
+test/ts/*.js
+
+# coverage
+coverage
+.nyc_output
+/legacy.js
+
+# yarn
+*.lock
+
+# php files
+index.php
+
+# Numerous always-ignore extensions
+*.bak
+*.patch
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.zip
+*.vi
 *~
-*.pyc
-*.pyo
-__pycache__/
-*stats*.dat*
+*.sass-cache
+package-lock.json
 
-# pycharm cache folder
-.idea/
+# npm package
+*.tgz
 
-examples/openai-lander/results/
-examples/openai-walker/results/
-examples/picture2d/*.bin
-examples/picture2d/*.png
-examples/picture2d/rendered/
-venv
+# OS or Editor folders
+.DS_Store
+._*
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+*.sublime-project
+nbproject
+thumbs.db
+*.*-workspace
 
-*.gv
-*.svg
-build
-dist
-neat_python.egg-info
+# Folders to ignore
+.hg
+.svn
+.CVS
+.idea
+node_modules
+old/
+*-old/
+*-notrack/
+no-track/
+build/
+combo/
+reference/
+jscoverage_lib/
+temp/
