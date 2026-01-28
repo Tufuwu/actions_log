@@ -1,122 +1,42 @@
----
-name: "CI"
-concurrency:  # Cancel any existing runs of this workflow for this same PR
-  group: "${{ github.workflow }}-${{ github.ref }}"
-  cancel-in-progress: true
-on: # yamllint disable-line rule:truthy rule:comments
-  push:
-    branches:
-      - "main"
-    tags:
-      - "v*"
-  pull_request: ~
+name: ci
+
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  black:
-    runs-on: "ubuntu-24.04"
-    steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v2"
-      - name: "Setup environment"
-        uses: "networktocode/gh-action-setup-poetry-environment@v4"
-      - name: "Linting: black"
-        run: "poetry run black ./ --diff --check"
-  flake8:
-    runs-on: "ubuntu-24.04"
-    steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v2"
-      - name: "Setup environment"
-        uses: "networktocode/gh-action-setup-poetry-environment@v4"
-      - name: "Linting: flake8"
-        run: "poetry run flake8 ./"
-    needs:
-      - "black"
-  yamllint:
-    runs-on: "ubuntu-24.04"
-    steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v2"
-      - name: "Setup environment"
-        uses: "networktocode/gh-action-setup-poetry-environment@v4"
-      - name: "Linting: yamllint"
-        run: "poetry run yamllint ./"
-    needs:
-      - "black"
-  tests:
+  test:
+    name: Python ${{ matrix.python-version }}
+
+    runs-on: ubuntu-latest
+
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
-    runs-on: "ubuntu-24.04"
+
     steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v2"
-      - name: "Set up Python"
-        uses: "actions/setup-python@v4"
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
         with:
-          python-version: "${{ matrix.python-version }}"
-      - name: "Install Poetry"
-        run: "pip install poetry==1.1.15"
-      - name: "Install Python Packages"
-        run: "poetry install"
-      - name: "Running tests"
-        run: "poetry run pytest -v"
-    needs:
-      - "flake8"
-      - "yamllint"
-  publish_gh:
-    name: "Publish to GitHub"
-    runs-on: "ubuntu-24.04"
-    if: "startsWith(github.ref, 'refs/tags/v')"
-    steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v2"
-      - name: "Set up Python"
-        uses: "actions/setup-python@v4"
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install test deps
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install -U wheel
+          python3 -m pip install -U coverage mypy
+      - name: Install project deps
+        run: python3 -m pip install -r requirements.txt
+      
+      - name: Run tests
+        run: |
+          python3 -m coverage run --branch -m unittest discover -t . -s ni/test/
+          python3 -m coverage xml -o ./coverage.xml
+
+      - name: Run mypy
+        run: python3 -m mypy ni/*.py
+        
+      - uses: codecov/codecov-action@v2
         with:
-          python-version: "3.9"
-      - name: "Install Python Packages"
-        run: "pip install poetry"
-      - name: "Set env"
-        run: "echo RELEASE_VERSION=${GITHUB_REF:10} >> $GITHUB_ENV"
-      - name: "Run Poetry Version"
-        run: "poetry version $RELEASE_VERSION"
-      - name: "Run Poetry Build"
-        run: "poetry build"
-      - name: "Upload binaries to release"
-        uses: "svenstaro/upload-release-action@v4"
-        with:
-          repo_token: "${{ '{{ secrets.NTC_GITHUB_TOKEN }}' }}"
-          file: "dist/*"
-          tag: "${{ '{{ github.ref }}' }}"
-          overwrite: true
-          file_glob: true
-    needs:
-      - "tests"
-  publish_pypi:
-    name: "Push Package to PyPI"
-    runs-on: "ubuntu-24.04"
-    if: "startsWith(github.ref, 'refs/tags/v')"
-    steps:
-      - name: "Check out repository code"
-        uses: "actions/checkout@v4"
-      - name: "Set up Python"
-        uses: "actions/setup-python@v4"
-        with:
-          python-version: "3.9"
-      - name: "Install Python Packages"
-        run: "pip install poetry"
-      - name: "Set env"
-        run: "echo RELEASE_VERSION=${GITHUB_REF:10} >> $GITHUB_ENV"
-      - name: "Run Poetry Version"
-        run: "poetry version $RELEASE_VERSION"
-      - name: "Run Poetry Build"
-        run: "poetry build"
-      - name: "Push to PyPI"
-        uses: "pypa/gh-action-pypi-publish@release/v1"
-        with:
-          user: "__token__"
-          password: "${{ '{{ secrets.PYPI_API_TOKEN }}' }}"
-    needs:
-      - "tests"
+          file: ./coverage.xml
