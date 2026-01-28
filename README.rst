@@ -1,49 +1,44 @@
-================================
-QEMU test provider for virt-test
-================================
+PyPI Notifier
+=============
 
-This is the official [1] test provider for the following
-subtest types:
+http://www.pypi-notifier.org
 
-* QEMU
-* Generic (Virtualization backend agnostic)
-* OpenVSwitch
+Watches your ``requirements.txt`` files and notifies you via email when
+a requirement is updated.
 
-Really quick start guide
-------------------------
+.. image:: https://travis-ci.org/cenkalti/pypi-notifier.svg?branch=master
+    :target: https://travis-ci.org/cenkalti/pypi-notifier
 
-1) Fork this repo on github
-2) Create a new topic branch for your work
-3) Create a new test provider file in your virt test repo,
-   like:
+Requirements
+------------
 
-::
+Python 3 is required to run PyPI Notifier. Install the project's dependencies
+with::
 
-    cp io-github-autotest-qemu.ini myprovider.ini
-::
+    pip install -r requirements.txt
 
-    [provider]
-    uri: file:///home/foo/Code/tp-qemu
-    [generic]
-    subdir: generic/
-    [qemu]
-    subdir: qemu/
-    [openvswitch]
-    subdir: openvswitch/
-You can optionally delete temporarily the
-`io-github-autotest-qemu.ini` file, just so you don't have test
-conflicts. Then you can develop your new test code, run it
-using virt test, and commit your changes.
+Running
+-------
 
-4) Make sure you have `inspektor installed. <https://github.com/autotest/inspektor#inspektor>`_
-5) Run:
+First, add your Github client credentials into development config in `config.py`.
 
-::
+Then, set your config env var in your shell::
 
-    inspekt checkall --disable-style E501,E265,W601,E402,E722,E741 --no-license-check
+    export PYPI_NOTIFIER_CONFIG=development
 
-6) Fix any problems
-7) Push your changes and submit a pull request
-8) That's it.
+Create necessary tables for the application::
 
-[1] You can always create your own test provider, if you have special purposes, or just want to develop your work independently.
+    flask init-db
+
+Web server is run with `gevent <http://www.gevent.org/>`_.
+There is a script for running the web server::
+
+    ./run_gevent.py
+
+Flask development server can be run with the following command::
+
+    flask run
+
+An hourly task is run by a scheduler to send emails::
+
+    flask hourly
