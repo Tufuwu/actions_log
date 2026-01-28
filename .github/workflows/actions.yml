@@ -1,45 +1,42 @@
-name: "Build workflow"
+name: Tests
+
 on:
-  pull_request:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  build-test:
-    runs-on: ubuntu-24.04
-    container: python:${{ matrix.python }}-slim
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python: ['3.6', '3.7', '3.8', '3.9']
+        os: [ubuntu-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 'pypy-3.8', 'pypy-3.9', 'pypy-3.10', 'pypy-3.11']
+
+
     steps:
-      - run: python3 --version
-      - name: Check out code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Install pip dependencies
-        run: pip install -r requirements.txt
-      - name: Build and Test
-        run: |
-          pytest
-          mypy pyteal
-          python3 -c "import pyteal" scripts/generate_init.py --check
-          black --check .
-  upload-to-pypi:
-    runs-on: ubuntu-24.04
-    needs: ['build-test']
-    if: ${{ github.event_name == 'push' && contains(github.ref, 'master') && startsWith(github.ref, 'refs/tags') }}
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Install dependencies
-        run: pip install wheel
-      - name: Build package
-        run: python setup.py sdist bdist_wheel
-      - name: Release
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov coveralls
+        pip install -e .
+
+    - name: Run tests with coverage
+      run: |
+        pytest tests/ --cov=neat --cov-report=term --cov-report=xml -v
+
+    - name: Upload coverage to Coveralls
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        coveralls --service=github

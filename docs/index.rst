@@ -1,58 +1,49 @@
-.. PyTeal documentation master file, created by
-   sphinx-quickstart on Fri Jan 31 14:27:13 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Welcome to NEAT-Python's documentation!
+=======================================
 
-PyTeal: Algorand Smart Contracts in Python
-==========================================
+:abbr:`NEAT (NeuroEvolution of Augmenting Topologies)` is a method developed by Kenneth O. Stanley for evolving arbitrary neural
+networks. NEAT-Python is a pure Python implementation of NEAT, with no dependencies other than the Python standard library.
 
-PyTeal is a Python language binding for `Algorand Smart Contracts (ASC1s) <https://developer.algorand.org/docs/asc>`_. 
+Currently this library supports Python versions 3.6 through 3.11, as well as PyPy 3.
 
-Algorand Smart Contracts are implemented using a new language that is stack-based, 
-called `Transaction Execution Approval Language (TEAL) <https://developer.algorand.org/docs/teal>`_. 
-This a non-Turing complete language that allows branch forwards but prevents recursive logic 
-to maximize safety and performance. 
+Many thanks to the original authors of this implementation, Cesar Gomes Miguel, Carolina Feher da Silva, and Marcio Lobo Netto!
 
-However, TEAL is essentially an assembly language.
-With PyTeal, developers can express smart contract logic purely using Python. 
-PyTeal provides high level, functional programming style abstactions over TEAL
-and does type checking at construction time.
+.. note::
+  Some of the example code has other dependencies. For your convenience there is a conda environment YAML file in the
+  examples directory you can use to set up an environment that will support all of the current examples.
+  TODO: Improve README.md file information for the examples.
 
-The :doc:`User Guide </data_type>` describes many useful features in PyTeal, and the complete documentation for every expression and operation can be found in the :doc:`PyTeal Package API documentation </api>`.
+For further information regarding general concepts and theory, please see `Selected Publications
+<http://www.cs.ucf.edu/~kstanley/#publications>`_ on Stanley's website, or his recent `AMA on Reddit
+<https://www.reddit.com/r/IAmA/comments/3xqcrk/im_ken_stanley_artificial_intelligence_professor>`_.
 
-PyTeal **hasn't been security audited**. Use it at your own risk.
+If you encounter any confusing or incorrect information in this documentation, please open an issue in the `GitHub project
+<https://github.com/CodeReclaimers/neat-python>`_.
+
+.. _toc-label:
+
+Contents:
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Getting Started
+   :maxdepth: 2
 
-   overview
+   neat_overview
    installation
-   examples
-
-.. toctree::
-   :maxdepth: 1
-   :caption: User Guide
-
-   data_type
-   arithmetic_expression
-   byte_expression
-   accessing_transaction_field
-   crypto
-   scratch
-   loading_group_transaction
-   control_structures
-   state
-   assets
-   versions
-
-.. toctree::
-   :maxdepth: 3
-   :caption: API
-
-   api
+   migration
+   config_file
+   xor_example
+   customization
+   activation
+   ctrnn
+   module_summaries
+   genome-interface
+   reproduction-interface
+   glossary
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
