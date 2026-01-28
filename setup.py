@@ -1,30 +1,38 @@
-#!/usr/bin/env python3
-import sys
-from setuptools import setup
+# coding=utf-8
+import codecs
+
+from setuptools import setup, find_packages
+
+
+def long_description():
+    try:
+        with codecs.open('README.md', 'r', 'utf-8') as f:
+            return f.read()
+    except:
+        return 'Error loading README.md'
+
 
 setup(
-    name='ssh-ldap-pubkey',
-    version='1.3.3',
-    url='https://github.com/jirutka/ssh-ldap-pubkey',
-    description='Utility to manage SSH public keys stored in LDAP.',
-    long_description=open('README.md', 'r').read(),
-    long_description_content_type='text/markdown',
-    author='Jakub Jirutka',
-    author_email='jakub@jirutka.cz',
-    license='MIT',
-    packages=['ssh_ldap_pubkey'],
-    scripts=['bin/ssh-ldap-pubkey', 'bin/ssh-ldap-pubkey-wrapper'],
+    name='django-earthdistance',
+    version='1.1.3',
     install_requires=[
-        'docopt>=0.6.2,<0.7.0',
-        'python-ldap>=3.0.0,<4'
-    ],
+        'django>=1.8'],
+    url='https://github.com/jneight/django-earthdistance',
+    description='Add support for PostgreSQL earthdistance extension to Django',
+    long_description=long_description(),
+    long_description_content_type='text/markdown',
+    packages=find_packages(),
+    include_package_data=True,
+    license='Apache 2.0',
     classifiers=[
-        'Environment :: Console',
+        'Environment :: Web Environment',
+        'Framework :: Django',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: POSIX',
-        'Programming Language :: Python :: 3',
-        'Topic :: System',
-        'Topic :: Utilities'
-    ]
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
+    ],
+    author='Javier Cordero Martinez',
+    author_email='github@j2i.me'
 )
