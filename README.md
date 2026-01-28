@@ -1,37 +1,136 @@
-# NTC Templates
+# OpenCage Geocoding Module for Python
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/networktocode/ntc-templates/master/docs/images/icon-ntc-templates.png" class="logo" height="200px">
-  <br>
-  <a href="https://github.com/networktocode/ntc-templates/actions"><img src="https://github.com/networktocode/ntc-templates/actions/workflows/ci.yml/badge.svg?branch=main"></a>
-  <a href="https://ntc-templates.readthedocs.io/en/latest"><img src="https://readthedocs.org/projects/ntc-templates/badge/"></a>
-  <a href="https://pypi.org/project/ntc-templates/"><img src="https://img.shields.io/pypi/v/ntc-templates"></a>
-  <a href="https://pypi.org/project/ntc-templates/"><img src="https://img.shields.io/pypi/dm/ntc-templates"></a>
-  <br>
-</p>
+A Python module to access the [OpenCage Geocoding API](https://opencagedata.com/).
 
-## Overview
+## Build Status / Code Quality / etc
 
-Repository of TextFSM Templates for Network Devices, and Python wrapper for TextFSM's CliTable. TextFSM is a tool to help make parsing cli commands more manageable.
+[![PyPI version](https://badge.fury.io/py/opencage.svg)](https://badge.fury.io/py/opencage)
+[![Downloads](https://pepy.tech/badge/opencage/month)](https://pepy.tech/project/opencage)
+[![Versions](https://img.shields.io/pypi/pyversions/opencage)](https://pypi.org/project/opencage/)
+![GitHub contributors](https://img.shields.io/github/contributors/opencagedata/python-opencage-geocoder)
+[![Build Status](https://github.com/OpenCageData/python-opencage-geocoder/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/OpenCageData/python-opencage-geocoder/actions/workflows/build.yml)
+![Mastodon Follow](https://img.shields.io/mastodon/follow/109287663468501769?domain=https%3A%2F%2Fen.osm.town%2F&style=social)
 
-## Documentation
+## Tutorial
 
-Full web-based HTML documentation for this library can be found over on the [NTC Templates Docs](https://ntc-templates.readthedocs.io) website:
+You can find a [comprehensive tutorial for using this module on the OpenCage site](https://opencagedata.com/tutorials/geocode-in-python).
 
-- [User Guide](https://ntc-templates.readthedocs.io/en/latest/user/lib_overview/) - Overview, Using the library, Getting Started.
-- [Administrator Guide](https://ntc-templates.readthedocs.io/en/latest/admin/install/) - How to Install, Configure, Upgrade, or Uninstall the library.
-- [Developer Guide](https://ntc-templates.readthedocs.io/en/latest/dev/contributing/) - Extending the library, Code Reference, Contribution Guide.
-- [Release Notes / Changelog](https://ntc-templates.readthedocs.io/en/latest/admin/release_notes/).
-- [Frequently Asked Questions](https://ntc-templates.readthedocs.io/en/latest/user/faq/).
+## Usage
 
-### Contributing to the Docs
+Supports Python 3.7 or newer. Use the older opencage 1.x releases if you need Python 2.7 support.
 
-All the Markdown source for the library documentation can be found under the [docs](https://github.com/networktocode/ntc-templates/tree/develop/docs) folder in this repository. For simple edits, a Markdown capable editor is sufficient - clone the repository and edit away.
+Install the module:
 
-If you need to view the fully generated documentation site, you can build it with [mkdocs](https://www.mkdocs.org/). A container hosting the docs will be started using the invoke commands (details in the [Development Environment Guide](https://ntc-templates.readthedocs.io/en/latest/dev/dev_environment/#docker-development-environment)) on [http://localhost:8001](http://localhost:8001). As your changes are saved, the live docs will be automatically reloaded.
+```bash
+pip install opencage
+```
 
-Any PRs with fixes or improvements are very welcome!
+Load the module:
 
-## Questions
+```python
+from opencage.geocoder import OpenCageGeocode
+```
 
-For any questions or comments, please check the [FAQ](https://ntc-templates.readthedocs.io/en/latest/user/faq/) first. Feel free to also swing by the [Network to Code Slack](https://networktocode.slack.com/) (channel `#networktocode`), sign up [here](http://slack.networktocode.com/) if you don't have an account.
+Create an instance of the geocoder module, passing a valid OpenCage Data Geocoder API key
+as a parameter to the geocoder modules's constructor:
+
+```python
+key = 'your-api-key-here'
+geocoder = OpenCageGeocode(key)
+```
+
+Pass a string containing the query or address to be geocoded to the modules' `geocode` method:
+
+```python
+query = '82 Clerkenwell Road, London'
+results = geocoder.geocode(query)
+```
+
+You can add [additional parameters](https://opencagedata.com/api#forward-opt):
+
+```python
+results = geocoder.geocode('London', no_annotations=1, language='es')
+```
+
+For example you can use the proximity parameter to provide the geocoder with a hint:
+
+```python
+results = geocoder.geocode('London', proximity='42.828576, -81.406643')
+print(results[0]['formatted'])
+# u'London, ON N6A 3M8, Canada'
+```
+
+### Reverse geocoding
+
+Turn a lat/long into an address with the `reverse_geocode` method:
+
+```python
+result = geocoder.reverse_geocode(51.51024, -0.10303)
+```
+
+### Sessions
+
+You can reuse your HTTP connection for multiple requests by
+using a `with` block. This can help performance when making
+a lot of requests:
+
+```python
+queries = ['82 Clerkenwell Road, London', ...]
+with OpenCageGeocode(key) as geocoder:
+    # Queries reuse the same HTTP connection
+    results = [geocoder.geocode(query) for query in queries]
+```
+
+### Asyncronous requests
+
+You can run requests in parallel with the `geocode_async` and `reverse_geocode_async`
+method which have the same parameters and response as their synronous counterparts.
+You will need at least Python 3.7 and the `asyncio` and `aiohttp` packages installed.
+
+```python
+async with OpenCageGeocode(key) as geocoder:
+    results = await geocoder.geocode_async(address)
+```
+
+For a more complete example and links to futher tutorials on asyncronous IO see
+`batch.py` in the `examples` directory.
+
+### Non-SSL API use
+
+If you have trouble accesing the OpenCage API with https, e.g. issues with OpenSSL
+libraries in your enviroment, then you can set the 'http' protocol instead. Please
+understand that the connection to the OpenCage API will no longer be encrypted.
+
+```python
+geocoder = OpenCageGeocode('your-api-key', 'http')
+```
+
+### Command-line batch geocoding
+
+See `examples/batch.py` for an example to geocode a CSV file.
+
+<img src="batch-progress.gif"/>
+
+### Exceptions
+
+If anything goes wrong, then an exception will be raised:
+
+- `InvalidInputError` for non-unicode query strings
+- `NotAuthorizedError` if API key is missing, invalid syntax or disabled
+- `ForbiddenError` API key is blocked or suspended
+- `RateLimitExceededError` if you go past your rate limit
+- `UnknownError` if there's some problem with the API (bad results, 500 status code, etc)
+
+## Copyright & License
+
+This software is copyright OpenCage GmbH.
+Please see `LICENSE.txt`
+
+### Who is OpenCage GmbH?
+
+<a href="https://opencagedata.com"><img src="opencage_logo_300_150.png"/></a>
+
+We run a worldwide [geocoding API](https://opencagedata.com/api) and [geosearch](https://opencagedata.com/geosearch) service based on open data.
+Learn more [about us](https://opencagedata.com/about).
+
+We also run [Geomob](https://thegeomob.com), a series of regular meetups for location based service creators, where we do our best to highlight geoinnovation. If you like geo stuff, you will probably enjoy [the Geomob podcast](https://thegeomob.com/podcast/).
