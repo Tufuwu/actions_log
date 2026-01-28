@@ -1,87 +1,58 @@
+.. PyTeal documentation master file, created by
+   sphinx-quickstart on Fri Jan 31 14:27:13 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
+PyTeal: Algorand Smart Contracts in Python
+==========================================
 
-***************************************
-PSF Homogenization kERnels - ``pypher``
-***************************************
+PyTeal is a Python language binding for `Algorand Smart Contracts (ASC1s) <https://developer.algorand.org/docs/asc>`_. 
 
-.. image:: _static/logo.jpg
-    :scale: 40 %
-    :alt: pypher logo
-    :align: right
+Algorand Smart Contracts are implemented using a new language that is stack-based, 
+called `Transaction Execution Approval Language (TEAL) <https://developer.algorand.org/docs/teal>`_. 
+This a non-Turing complete language that allows branch forwards but prevents recursive logic 
+to maximize safety and performance. 
 
-Compute an homogenization kernel between two PSFs
+However, TEAL is essentially an assembly language.
+With PyTeal, developers can express smart contract logic purely using Python. 
+PyTeal provides high level, functional programming style abstactions over TEAL
+and does type checking at construction time.
 
-This code is well suited for PSF matching applications in both an astronomical or microscopy context.
+The :doc:`User Guide </data_type>` describes many useful features in PyTeal, and the complete documentation for every expression and operation can be found in the :doc:`PyTeal Package API documentation </api>`.
 
-It has been developed as part of the ESA Euclid_ mission and is currently being used for multi-band photometric studies of HST_ (visible) and Herschel_ (IR) data.
-
-Features
-========
-
-1. **Warp** (rotation + resampling) the PSF images (if necessary),
-2. **Filter** images in Fourier space using a regularized Wiener filter,
-3. **Produce** a homogenization kernel.
-
-**Note:** ``pypher`` needs the pixel scale information to be present in the FITS files. If not, use the provided ``addpixscl`` method to add this missing info.
-
-.. warning:: This code **does not**    
-
-    * interpolate NaN values (replaced by 0 instead),
-    * center PSF images,
-    * minimize the kernel size.
-
-Quick setup
-===========
-
-In most cases the code can be installed via
-
-.. code:: bash
-
-    $ pip install pypher
-
-and a kernel can then be produced from two PSFs with a simple command line
-
-.. code:: bash
-
-    $ pypher psf_a.fits psf_b.fits kernel_a_to_b.fits
-
-Other installation procedures are described on the :ref:`installation page <installation>` and further command line options :ref:`here <usage>`.
-
-User Guide
-==========
+PyTeal **hasn't been security audited**. Use it at your own risk.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: Getting Started
 
+   overview
    installation
-   usage
-   convenience
-   contribution
+   examples
 
+.. toctree::
+   :maxdepth: 1
+   :caption: User Guide
 
-Acknowledging
-=============
+   data_type
+   arithmetic_expression
+   byte_expression
+   accessing_transaction_field
+   crypto
+   scratch
+   loading_group_transaction
+   control_structures
+   state
+   assets
+   versions
 
-If you make use of any product of this code in a scientific publication,
-please consider acknowledging the work by citing the following paper
+.. toctree::
+   :maxdepth: 3
+   :caption: API
 
-Boucaud *et al.* (2016) "Convolution kernels for multi-wavelength imaging"
+   api
 
+Indices and tables
+==================
 
-.. note:: submitted to *Astronomy & Astrophysics* journal
-
-----
-
-:Author:
-    Alexandre Boucaud 
-:Email:
-    alexandre.boucaud [at] ias.u-psud.fr
-:Licence:
-    This work is licensed under a 3-clause BSD license
-
-----
-
-.. _Euclid: http://www.cosmos.esa.int/web/euclid
-.. _Herschel: http://www.cosmos.esa.int/web/herschel/home
-.. _HST: https://www.spacetelescope.org/
-.. _license: https://git.ias.u-psud.fr/aboucaud/pypher/blob/packaging/LICENSE
+* :ref:`genindex`
