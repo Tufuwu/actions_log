@@ -1,66 +1,32 @@
-# Changelog
+# `node-ignore` 5 ChangeLog
 
-All notable changes to neat-python will be documented in this file.
+# 5.x
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## 2018-08-14, Version 5.0.1
 
-## [Unreleased]
+- **PATCH**: fixes for windows.
+- **PATCH**: improves tests for typescript and windows.
 
-## [1.0.0] - 2025-01-09
+## 2018-08-13, Version 5.0.0
 
-### Added
-- **Innovation Number Tracking**: Full implementation of innovation numbers as described in the original NEAT paper (Stanley & Miikkulainen, 2002, Section 3.2)
-  - Global innovation counter that increments across all generations
-  - Same-generation deduplication of identical mutations
-  - Innovation-based gene matching during crossover
-  - Proper historical marking of genes for speciation
-- New `InnovationTracker` class in `neat/innovation.py`
-- Comprehensive unit tests in `tests/test_innovation.py` (19 tests)
-- Integration tests in `tests/test_innovation_integration.py` (6 tests)
-- Innovation tracking documentation in `INNOVATION_TRACKING_IMPLEMENTATION.md`
+- **SEMVER-MAJOR**: [#20](https://github.com/kaelzhang/node-ignore/issues/20): it will throw if an invalid pathname passes into `.ignores(pathname)`, see [Upgrade 4.x -> 5.x](https://github.com/kaelzhang/node-ignore#upgrade-4x---5x).
+- **FEATURE**: [#31](https://github.com/kaelzhang/node-ignore/issues/31): adds a new method [`.test(pathname)`](https://github.com/kaelzhang/node-ignore#testpathname-pathname-since-500).
+- **BENCHMARK**: improves performance by 26%.
 
-### Changed
-- **BREAKING**: `DefaultConnectionGene.__init__()` now requires mandatory `innovation` parameter
-- **BREAKING**: All connection gene creation must include innovation numbers
-- **BREAKING**: Crossover now matches genes primarily by innovation number, not tuple keys
-- **BREAKING**: Old checkpoints from pre-1.0 versions are incompatible with 1.0.0+
-- `DefaultGenome.configure_crossover()` updated to match genes by innovation number per NEAT paper Figure 4
-- All genome initialization methods assign innovation numbers to connections
-- `DefaultReproduction` now creates and manages an `InnovationTracker` instance
-- Checkpoint format updated to preserve innovation tracker state
-- `ParallelEvaluator` now implements context manager protocol (`__enter__`/`__exit__`) for proper resource cleanup
-- Improved resource management in `ParallelEvaluator` to prevent multiprocessing pool leaks
-- Fixed `ParallelEvaluator.__del__()` to properly clean up resources without calling `terminate()` unnecessarily
+# 4.x
 
-### Removed
-- **BREAKING**: `ThreadedEvaluator` has been removed
-  - Reason: Minimal utility due to Python's Global Interpreter Lock (GIL)
-  - Had implementation issues including unreliable cleanup and potential deadlocks
-  - Migration: Use `ParallelEvaluator` for CPU-bound tasks
-- **BREAKING**: `DistributedEvaluator` has been removed
-  - Reason: Marked as beta/unstable with known reliability issues
-  - Overly complex implementation (574 lines) with fragile error handling
-  - Migration: Use established frameworks like Ray or Dask for distributed computing
-- Removed `neat/threaded.py` module
-- Removed `neat/distributed.py` module  
-- Removed example files: `examples/xor/evolve-feedforward-threaded.py` and `examples/xor/evolve-feedforward-distributed.py`
-- Removed test files: `tests/test_distributed.py` and `tests/test_xor_example_distributed.py`
+## 2018-08-12, Version 4.0.6
 
-### Added
-- Context manager support for `ParallelEvaluator` - recommended usage pattern
-- `ParallelEvaluator.close()` method for explicit resource cleanup
-- New tests for `ParallelEvaluator` context manager functionality
-- `MIGRATION.md` guide for users migrating from removed evaluators
+- **PATCH**: `Object.prototype` methods will not ruin the result any more.
 
-### Migration
-- See [MIGRATION.md](MIGRATION.md) for detailed guidance on updating existing code
-- `ParallelEvaluator` remains fully backward compatible but context manager usage is recommended
+## ~ 2018-08-09, Version 4.0.1 - 4.0.5
 
-## [0.93] - Previous Release
+- **PATCH**: updates README.md about frequent asked quesions from github issues.
 
-*Note: Changelog started with version 1.0. For changes prior to 1.0, please see git history.*
+## 2018-06-22, Version 4.0.0
 
----
-
-**For the complete migration guide, see [MIGRATION.md](MIGRATION.md)**
+- **SEMVER-MAJOR**: Drop support for node < 6 by default.
+- **FEATURE**: supports the missing character ranges and sets, such as `*.[a-z]` and `*.[jJ][pP][gG]`
+- **FEATURE**: new option: `ignorecase` to make `ignore` case insensitive.
+- **FEATURE**: supports question mark which matches a single character.
+- **PATCH**: fixes typescript declaration.

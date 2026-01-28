@@ -1,42 +1,26 @@
-name: Tests
+name: build
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push]
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 'pypy-3.8', 'pypy-3.9', 'pypy-3.10', 'pypy-3.11']
+  build:
 
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
       with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, build, and test
       run: |
-        python -m pip install --upgrade pip
-        pip install pytest pytest-cov coveralls
-        pip install -e .
-
-    - name: Run tests with coverage
-      run: |
-        pytest tests/ --cov=neat --cov-report=term --cov-report=xml -v
-
-    - name: Upload coverage to Coveralls
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        npm install
+        npm run build --if-present
+        npm test
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        coveralls --service=github
+        CI: true
