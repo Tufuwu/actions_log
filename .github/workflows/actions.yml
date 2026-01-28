@@ -1,68 +1,42 @@
-name: test
+name: ci
 
-on:
-  push:
-    branches:
-      - master
-      - "test-me-*"
-    tags:
-      - "*"
-  pull_request:
-    branches:
-      - master
-
-# Set permissions at the job level.
-permissions: {}
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  lint:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-
-    steps:
-    - uses: actions/checkout@v3
-
-    - uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox
-
-    - name: Lint
-      run: tox -e lint
-
   test:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
+    name: Python ${{ matrix.python-version }}
+
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        python: [
-          "3.8",
-          "3.9",
-          "3.10",
-          "3.11",
-        ]
+        python-version: ["3.8", "3.9", "3.10"]
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
 
-    - uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python }}
+      - name: Install test deps
+        run: |
+          python3 -m pip install -U pip
+          python3 -m pip install -U wheel
+          python3 -m pip install -U coverage mypy
+      - name: Install project deps
+        run: python3 -m pip install -r requirements.txt
+      
+      - name: Run tests
+        run: |
+          python3 -m coverage run --branch -m unittest discover -t . -s ni/test/
+          python3 -m coverage xml -o ./coverage.xml
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox
-
-    - name: Test
-      run: tox -e py
+      - name: Run mypy
+        run: python3 -m mypy ni/*.py
+        
+      - uses: codecov/codecov-action@v2
+        with:
+          file: ./coverage.xml
