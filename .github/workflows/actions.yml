@@ -1,44 +1,41 @@
 name: CI
 
 on:
-  push:
-    branches: [ main, master ]
+  workflow_dispatch:
   pull_request:
-    branches: [ main, master ]
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  test:
+    name: Test
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10"]
+        python-version: ['3.8', '3.9', '3.10']
+        os: [ubuntu-latest]
 
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout demo
+        uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: 'requirements.txt'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python3 -m pip install -U pip
+          python3 -m pip install -r requirements.txt
 
-      - name: Lint with flake8
+      - name: Run demo
         run: |
-          pip install flake8
-          flake8 --ignore=E501,W503
-
-      - name: Run tests with pytest and coverage
-        run: |
-          pip install pytest pytest-cov
-          pytest -v --cov-report=xml --cov=src/sdialog
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          python3 run_demo_md.py
