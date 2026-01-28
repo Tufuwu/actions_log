@@ -1,26 +1,42 @@
-name: Crossplane CI
+name: Docker Image CI
 
 on:
-  workflow_dispatch:
   push:
-    paths-ignore:
-      - '**.md'
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
+  build:
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", pypy-3.6, pypy-3.7, pypy-3.8, pypy-3.9]
-
+        include:
+          - python_version: 3.12-rc-bullseye
+            postgres_version: 15
+          - python_version: 3.11-bullseye
+            postgres_version: 15
+          - python_version: 3.11-bullseye
+            postgres_version: 14
+          - python_version: 3.10-bullseye
+            postgres_version: 14
+          - python_version: 3.10-bullseye
+            postgres_version: 13
+          - python_version: 3.10-bullseye
+            postgres_version: 12
+          - python_version: 3.9-bullseye
+            postgres_version: 14
+          - python_version: 3.8-bullseye
+            postgres_version: 14
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_VERSION: ${{ matrix.postgres_version }}
+      PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Run tox under Python ${{ matrix.python-version }}
-        run: |
-          pip install tox
-          tox -e py
+    - name: Build the Docker image
+      uses: actions/checkout@v3 
+
+    - name: Start containers
+      run: docker compose build
+
+    - name: Run tests
+      run: docker compose run --entrypoint="pytest tests" nycdb
