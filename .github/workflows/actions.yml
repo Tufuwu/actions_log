@@ -1,49 +1,42 @@
-name: Build and Test
+name: Serverless LocalStack CI
+
 on:
   push:
-    paths-ignore:
-      - 'README.md'
+    branches: [ main ]
   pull_request:
-    paths-ignore:
-      - 'README.md'
+    branches: [ main ]
 
 jobs:
-  build_and_test:
-    name: Build and run tests
+  serverless-localstack-test:
+    name: Serverless LocalStack CI
     runs-on: ubuntu-latest
-    services:
-        postgres:
-            image: postgres:10
-            env:
-                POSTGRES_USER: postgres
-                POSTGRES_PASSWORD: postgres
-                POSTGRES_DB: sequelize
-            ports:
-                - 5432:5432
-            options:
-                --health-cmd pg_isready
-                --health-interval 10s
-                --health-timeout 5s
-                --health-retries 5
-    strategy:
-      matrix:
-        node-version: [node]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      - run: psql -h 127.0.0.1 -U postgres -d sequelize -c 'create schema if not exists sails;'
-        env:
-            PGPASSWORD: postgres
-      - run: npm ci
-      - run: npm test
-        env:
-            PGPASSWORD: postgres
-      - name: Create test coverage report
-        run: ./node_modules/nyc/bin/nyc.js report --reporter=lcovonly
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '12'
+
+      - name: Start LocalStack
+        run: |
+          pip install localstack awscli-local[ver1]
+          docker pull localstack/localstack
+          localstack start -d
+          localstack wait -t 30
+          
+      - name: Install deps
+        run: |
+          npm ci
+          
+      - name: Run Lint and Test
+        run: |
+          set -e
+          npm run lint
+          npm run test
+          
+      - name: Integration Tests
+        run: |
+          npm link
+          sleep 5; SLS_DEBUG=1 npm run test:integration
