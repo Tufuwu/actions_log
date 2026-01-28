@@ -1,6 +1,10 @@
+logs
 *.log
-*.pot
-*.pyc
-build/
-dist/
-django_earthdistance.egg-info/
+npm-debug.log*
+node_modules/
+.idea/
+*.code-workspace
+.nyc_output/
+coverage/
+coverage.lcov
+*.iml
