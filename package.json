@@ -1,65 +1,67 @@
 {
-  "name": "react-cytoscapejs",
-  "version": "1.2.1",
-  "description": "React-based network visualization component, using Cytoscape",
-  "license": "MIT",
+  "name": "megajs",
+  "version": "0.17.2",
+  "description": "Unofficial JavaScript SDK for MEGA",
+  "main": "dist/main.node-cjs.js",
+  "exports": {
+    "node": {
+      "require": "./dist/main.node-cjs.js",
+      "import": "./dist/main.node-es.js"
+    },
+    "default": {
+      "require": "./dist/main.browser-cjs.js",
+      "import": "./dist/main.browser-es.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/plotly/react-cytoscapejs.git"
+    "url": "https://github.com/qgustavor/mega.git"
   },
-  "bugs": {
-    "url": "https://github.com/plotly/react-cytoscapejs/issues"
-  },
-  "amdName": "ReactCytoscape",
-  "exports": "./dist/react-cytoscape.modern.js",
-  "main": "dist/react-cytoscape.cjs.js",
-  "module": "dist/react-cytoscape.module.js",
-  "source": "src/index.js",
-  "umd:main": "dist/react-cytoscape.umd.js",
-  "unpkg": "dist/react-cytoscape.umd.js",
-  "homepage": "https://github.com/plotly/react-cytoscapejs",
+  "keywords": [
+    "mega",
+    "storage"
+  ],
   "scripts": {
-    "prepare": "run-s build build:docgen",
-    "build": "microbundle --globals=react=React,cytoscape=cytoscape,prop-types=PropTypes",
-    "build:docgen": "react-docgen src/component.js --pretty -o dist/react-cytoscape.docgen.json",
-    "clean": "rimraf dist/*",
-    "test:eslint": "eslint src/**",
-    "test:eslint:fix": "eslint --fix src/**",
-    "test:prettier": "prettier --list-different src/**",
-    "test:prettier:fix": "prettier --write src/**",
-    "test:mocha": "run-s build test:mocha:run",
-    "test:mocha:run": "mocha-chrome test/index.html",
-    "test": "run-s test:*",
-    "watch": "microbundle watch --globals=react=React,cytoscape=cytoscape,prop-types=PropTypes",
-    "start": "run-s watch"
+    "build": "node build",
+    "test": "npm run lint && ava",
+    "lint": "standard",
+    "lint-fix": "standard --fix",
+    "dist": "npm run test && npm run build"
   },
-  "peerDependencies": {
-    "react": ">=15.0.0"
+  "standard": {
+    "ignore": [
+      "dist"
+    ]
+  },
+  "author": "Tõnis Tiigi <tonistiigi@gmail.com>",
+  "contributors": [
+    "Gustavo Rodrigues (https://qgustavor.tk)"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "abort-controller": "^3.0.0",
+    "combined-stream": "^1.0.8",
+    "node-fetch": "^2.6.7",
+    "secure-random": "^1.1.2",
+    "stream-combiner": "^0.2.2",
+    "stream-skip": "^1.0.3",
+    "through": "^2.1.0"
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "eslint": "^4.6.1",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^5.1.1",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "immutable": "^3.8.2",
-    "microbundle": "^0.15.0",
-    "mocha": "^5.2.0",
-    "mocha-chrome": "^1.1.0",
-    "npm-run-all": "^4.1.1",
-    "prettier": "^1.13.7",
-    "react": "^16.4.1",
-    "react-docgen": "^2.21.0",
-    "react-dom": "^16.4.1",
-    "rimraf": "^2.6.2"
-  },
-  "engines": {
-    "node": ">=8.11.3"
-  },
-  "dependencies": {
-    "cytoscape": "^3.2.19",
-    "prop-types": "^15.6.2"
+    "ava": "^4.0.1",
+    "buffer": "^6.0.3",
+    "core-js": "^3.20.3",
+    "esbuild": "^0.14.11",
+    "esbuild-plugin-alias": "^0.2.1",
+    "events": "^3.3.0",
+    "mega-mock": "^0.3.0",
+    "readable-stream": "^3.6.0",
+    "regenerator-runtime": "^0.13.9",
+    "standard": "^16.0.4",
+    "tmp": "0.0.33",
+    "util": "^0.12.4"
   }
 }
