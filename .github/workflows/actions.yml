@@ -1,45 +1,37 @@
-name: "Build workflow"
+name: Tests
 on:
-  pull_request:
   push:
     branches:
       - main
+  pull_request:
+
 jobs:
-  build-test:
-    runs-on: ubuntu-24.04
-    container: python:${{ matrix.python }}-slim
+  build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ['3.6', '3.7', '3.8', '3.9']
+        python-version: ["3.8"]
     steps:
-      - run: python3 --version
-      - name: Check out code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
         with:
-          fetch-depth: 0
-      - name: Install pip dependencies
-        run: pip install -r requirements.txt
-      - name: Build and Test
+          python-version: ${{ matrix.python-version }}
+      - run: |
+          npm install -g elm
+          pip install tox
+      - name: Run Tox
         run: |
-          pytest
-          mypy pyteal
-          python3 -c "import pyteal" scripts/generate_init.py --check
-          black --check .
-  upload-to-pypi:
-    runs-on: ubuntu-24.04
-    needs: ['build-test']
-    if: ${{ github.event_name == 'push' && contains(github.ref, 'master') && startsWith(github.ref, 'refs/tags') }}
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Install dependencies
-        run: pip install wheel
-      - name: Build package
-        run: python setup.py sdist bdist_wheel
-      - name: Release
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          if [[ "${{ matrix.python-version }}" == "3.8" ]]; then
+            if [[ "${{ github.event_name }}" == "push" ]]; then
+              echo "Running tests for cover and black"
+              tox -e cover
+              tox -e black
+            else
+              tox
+            fi
+          else
+            tox
+          fi
+      - name: Coveralls
+        if: success() && github.event_name == 'push' && matrix.python-version == '3.8'
+        run: coveralls
