@@ -1,43 +1,40 @@
-import setuptools
+from setuptools import setup, find_packages
 
-with open("README.md", "r") as readme:
-    long_description = readme.read()
+from codecs import open
+from os import path
 
-setuptools.setup(
-    name="django-uniauth",
-    version="1.4.1",
-    author="Lance Goodridge",
-    author_email="ldgoodridge95@gmail.com",
-    keywords=["django", "auth", "authentication", "cas", "sso", "single sign-on"],
-    description="A Django app for managing CAS and custom user authentication.",
-    include_package_data=True,
+here = path.abspath(path.dirname(__file__))
+
+# Get the long description from the README file
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
+setup(
+    name='simple-pid',
+    version='1.0.1',
+    description='A simple, easy to use PID controller',
     long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/lgoodridge/django-uniauth",
-    license='LGPLv3',
-    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
-    install_requires=[
-        "Django>=1.11",
-        "python-cas>=1.4.0",
-        "djangorestframework-simplejwt>=4.1.0",
-    ],
-    extras_require = {
-        ":python_version<='3.2'": ["mock"],
-    },
-    packages=setuptools.find_packages(exclude=["demo-app",]),
+    long_description_content_type='text/markdown',
+    url='https://github.com/m-lundberg/simple-pid',
+    author='Martin Lundberg',
+    license='MIT',
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Framework :: Django",
-        "Framework :: Django :: 1.11",
-        "Framework :: Django :: 2",
-        "Framework :: Django :: 3",
-        "Framework :: Django :: 4",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
-        "Natural Language :: English",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 3",
-    ]
+        'Development Status :: 5 - Production/Stable',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+    ],
+    keywords='pid controller control',
+    packages=find_packages(exclude=['tests']),
+    package_data={
+        'simple_pid': ['*.pyi', 'py.typed'],
+    },
+    include_package_data=True,
+    zip_safe=False,
+    extras_require={
+        'docs': ['m2r', 'sphinx-rtd-theme'],
+    },
+    project_urls={
+        'Documentation': 'https://simple-pid.readthedocs.io/',
+    },
 )
