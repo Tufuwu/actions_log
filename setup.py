@@ -1,71 +1,103 @@
 #!/usr/bin/env python
-# Generic setup script for single-package Python projects
-# by Thomas Perl <thp.io/about>
+# -*- coding: utf-8 -*-
+# Copyright 2015-2020 grafana-dashboard-builder contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from __future__ import unicode_literals
 
-from distutils.core import setup
+import sys
 
-import re
-import os
-import glob
+from setuptools import setup
+from setuptools.command.test import test as TestCommand
 
-PACKAGE = 'mygpoclient'
-SCRIPT_FILE = os.path.join(PACKAGE, '__init__.py')
+__author__ = 'Jakub Plichta <jakub.plichta@gmail.com>'
 
-main_py = open(SCRIPT_FILE).read()
-metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", main_py))
-docstrings = re.findall('"""(.*?)"""', main_py, re.DOTALL)
 
-# List the packages that need to be installed/packaged
-PACKAGES = (
-        PACKAGE,
-)
+class Tox(TestCommand):
+    user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
 
-SCRIPTS = glob.glob('bin/*')
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.tox_args = None
 
-# Metadata fields extracted from SCRIPT_FILE
-AUTHOR_EMAIL = metadata['author']
-VERSION = metadata['version']
-WEBSITE = metadata['website']
-LICENSE = metadata['license']
-DESCRIPTION = docstrings[0].strip()
-if '\n\n' in DESCRIPTION:
-    DESCRIPTION, LONG_DESCRIPTION = DESCRIPTION.split('\n\n', 1)
-else:
-    LONG_DESCRIPTION = None
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
 
-# Extract name and e-mail ("Firstname Lastname <mail@example.org>")
-AUTHOR, EMAIL = re.match(r'(.*) <(.*)>', AUTHOR_EMAIL).groups()
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import tox
+        import shlex
 
-DATA_FILES = [
-    ('share/man/man1', glob.glob('man/*')),
-]
+        args = self.tox_args
+        if args:
+            args = shlex.split(self.tox_args)
+        errno = tox.cmdline(args=args)
+        sys.exit(errno)
 
-CLASSIFIERS = [
-    'Development Status :: 5 - Production/Stable',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.6',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: 3.4',
-]
 
-setup(name=PACKAGE,
-      version=VERSION,
-      description=DESCRIPTION,
-      long_description=LONG_DESCRIPTION,
-      author=AUTHOR,
-      author_email=EMAIL,
-      license=LICENSE,
-      url=WEBSITE,
-      packages=PACKAGES,
-      scripts=SCRIPTS,
-      data_files=DATA_FILES,
-      download_url=WEBSITE+PACKAGE+'-'+VERSION+'.tar.gz',
-      classifiers=CLASSIFIERS,
-    )
+params = {
+    'name': 'grafana-dashboard-builder',
+    'version': '0.7.0a3',
+    'packages': [
+        'grafana_dashboards',
+        'grafana_dashboards.client',
+        'grafana_dashboards.components'
+    ],
+    'scripts': [
+        'bin/grafana_dashboard_builder.py'
+    ],
+    'url': 'https://github.com/jakubplichta/grafana-dashboard-builder',
+    'license': 'Apache License, Version 2.0',
+    'author': 'Jakub Plichta',
+    'author_email': 'jakub.plichta@gmail.com',
+    'description': 'Generate Grafana dashboards with YAML',
+    'classifiers': [
+        'Topic :: Utilities',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+    ],
+    'keywords': 'grafana yaml graphite prometheus influxdb',
+    'cmdclass': {'test': Tox},
+    'tests_require': ['tox', 'mock'],
+    'install_requires': ['PyYAML>=5.3', 'argparse', 'requests-kerberos', 'requests'],
+    'python_requires': '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*',
+    'entry_points': {
+        'console_scripts': [
+            'grafana-dashboard-builder = grafana_dashboards.cli:main',
+        ],
+    },
+    'long_description':
+        """grafana-dashboard-builder is an open-source tool for easier creation of Grafana dashboards.
+It is written in Python and uses YAML descriptors for dashboard
+templates.
 
+This project has been inspired by Jenkins Job Builder that
+allows users to describe Jenkins jobs with human-readable format. grafana-dashboard-builder
+aims to provide similar simplicity to Grafana dashboard creation and to give users easy way how they can create
+dashboard templates filled with different configuration."""
+}
+
+setup(**params)
