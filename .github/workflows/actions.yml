@@ -1,54 +1,38 @@
-# This is a basic workflow to help you get started with Actions
+name: tests
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches:
-      - master
-      - development
+    branches: [ main ]
   pull_request:
-    branches:
-      - master
+    branches: [ main ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+env:
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
 jobs:
-  # This workflow contains a single job called "build"
   tests:
-    name: Testing on Python ${{matrix.python-version}} | ${{matrix.sim}}
-    runs-on: ubuntu-20.04
 
+    name: Run tests
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        python-version: [3.8, 3.9]
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      - name: Anaconda ${{matrix.python-version}} setup
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{matrix.python-version}}
-
-      - name: Dependency installation
-        shell: bash -l {0}
-        run: |
-          conda info -a
-          conda install numpy scipy pyyaml matplotlib nose jupyter pandas
-          pip install -r requirements.txt
-
-      - name: Package installation
-        shell: bash -l {0}
-        run: |
-          python setup.py develop
-
-      - name: Testing
-        shell: bash -l {0}
-        run: nosetests
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip setuptools
+        pip install ".[dev]"
+        pip install coverage coveralls
+    - name: Run pytest
+      run: |
+        pytest tests/regression_test.py
+        pytest -Werror --cov-branch --cov=mf2 tests/property_test.py tests/multi_fidelity_function_test.py
+    - name: Report coverage
+      run: |
+        coveralls --service=github
