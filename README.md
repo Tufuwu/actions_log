@@ -1,206 +1,245 @@
-# i18n-zipcodes [![Build Status](https://travis-ci.org/sarcadass/i18n-zipcodes.svg?branch=master)](https://travis-ci.org/sarcadass/i18n-zipcodes) [![codecov](https://codecov.io/gh/sarcadass/i18n-zipcodes/branch/master/graph/badge.svg)](https://codecov.io/gh/sarcadass/i18n-zipcodes)
+<div align="center">
+  <br/>
+  <a href="http://pm2.keymetrics.io/" title="PM2 Keymetrics link">
+    <img width=710px src="https://raw.githubusercontent.com/Unitech/pm2/master/pres/pm2-v4.png" alt="pm2 logo">
+  </a>
+  <br/>
+<br/>
+<b>P</b>(rocess) <b>M</b>(anager) <b>2</b><br/>
+  <i>Runtime Edition</i>
+<br/><br/>
 
-International zipcodes validator in Javascript, based on Regex for Node.js and the browser.
 
-## Install
+<a title="PM2 Downloads">
+  <img src="https://img.shields.io/npm/dm/pm2" alt="Downloads per Month"/>
+</a>
 
-### For Node.js:
-```sh
-$ npm install i18n-zipcodes
+<a title="PM2 Downloads">
+  <img src="https://img.shields.io/npm/dy/pm2" alt="Downloads per Year"/>
+</a>
+
+<a href="https://badge.fury.io/js/pm2" title="NPM Version Badge">
+   <img src="https://badge.fury.io/js/pm2.svg" alt="npm version">
+</a>
+
+<a href="https://travis-ci.com/github/Unitech/pm2" title="PM2 Tests">
+  <img src="https://travis-ci.org/Unitech/pm2.svg?branch=master" alt="Build Status"/>
+</a>
+
+<br/>
+<br/>
+<br/>
+</div>
+
+
+PM2 is a production process manager for Node.js applications with a built-in load balancer. It allows you to keep applications alive forever, to reload them without downtime and to facilitate common system admin tasks.
+
+Starting an application in production mode is as easy as:
+
+```bash
+$ pm2 start app.js
 ```
 
-### For the browser:
-* Download the script in the `dist` folder
+PM2 is constantly assailed by [more than 1800 tests](https://app.travis-ci.com/github/Unitech/pm2/branches).
+
+Official website: [https://pm2.keymetrics.io/](https://pm2.keymetrics.io/)
+
+Works on Linux (stable) & macOS (stable) & Windows (stable). All Node.js versions are supported starting Node.js 12.X.
 
 
-## Usage
+### Installing PM2
 
-```js
-i18nZipcodes(countryCode: string, zipCode: string): boolean
-// countryCode param is case insensitive
+With NPM:
+
+```bash
+$ npm install pm2 -g
 ```
 
-### For Node.js
-```js
-// CommonJS Syntax
-const i18nZipcodes = require('i18n-zipcodes');
-// or ES Syntax
-import i18nZipcodes from 'i18n-zipcodes';
+You can install Node.js easily with [NVM](https://github.com/nvm-sh/nvm#installing-and-updating) or [ASDF](https://blog.natterstefan.me/how-to-use-multiple-node-version-with-asdf).
 
-i18nZipcodes('US', '90210'); // true
+### Start an application
 
-i18nZipcodes('fr', '5632'); // false
+You can start any application (Node.js, Python, Ruby, binaries in $PATH...) like that:
+
+```bash
+$ pm2 start app.js
 ```
 
-### For the browser
-```html
-<script src="i18n-zipcodes.min.js"></script>
-<script>
-    console.log(i18nZipcodes('fr', '75014')); // true
-</script>
+Your app is now daemonized, monitored and kept alive forever.
+
+### Managing Applications
+
+Once applications are started you can manage them easily:
+
+![Process listing](https://github.com/Unitech/pm2/raw/master/pres/pm2-ls-v2.png)
+
+To list all running applications:
+
+```bash
+$ pm2 list
 ```
 
+Managing apps is straightforward:
 
-## 115 Countries supported
-Country codes use the [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) format.
+```bash
+$ pm2 stop     <app_name|namespace|id|'all'|json_conf>
+$ pm2 restart  <app_name|namespace|id|'all'|json_conf>
+$ pm2 delete   <app_name|namespace|id|'all'|json_conf>
+```
 
-### A
-- 🇦🇩 (`AD`) Andorra
-- 🇦🇲 (`AM`) Armenia
-- 🇦🇷 (`AR`) Argentina
-- 🇦🇸 (`AS`) American Samoa
-- 🇦🇹 (`AT`) Austria
-- 🇦🇺 (`AU`) Australia
-- 🇦🇿 (`AZ`) Azerbaijan
+To have more details on a specific application:
 
-### B
-- 🇧🇦 (`BA`) Bosnia and Herzegovina
-- 🇧🇩 (`BD`) Bangladesh
-- 🇧🇪 (`BE`) Belgium
-- 🇧🇬 (`BG`) Bulgaria
-- 🇧🇯 (`BJ`) Benin
-- 🇧🇲 (`BM`) Bermuda
-- 🇧🇳 (`BN`) Brunei
-- 🇧🇷 (`BR`) Brazil
-- 🇧🇾 (`BY`) Belarus
+```bash
+$ pm2 describe <id|app_name>
+```
 
-### C
-- 🇨🇦 (`CA`) Canada
-- 🇨🇭 (`CH`) Switzerland
-- 🇨🇳 (`CN`) China
-- 🇨🇺 (`CU`) Cuba
-- 🇨🇽 (`CX`) Christmas Island
-- 🇨🇾 (`CY`) Cyprus
-- 🇨🇿 (`CZ`) Czechia
+To monitor logs, custom metrics, application information:
 
-### D
-- 🇩🇪 (`DE`) Germany
-- 🇩🇰 (`DK`) Denmark
-- 🇩🇿 (`DZ`) Algeria
+```bash
+$ pm2 monit
+```
 
-### E
-- 🇪🇪 (`EE`) Estonia
-- 🇪🇸 (`ES`) Spain
+[More about Process Management](https://pm2.keymetrics.io/docs/usage/process-management/)
 
-### F
-- 🇫🇮 (`FI`) Finland
-- 🇫🇲 (`FM`) Micronesia
-- 🇫🇴 (`FO`) Faroe Islands
-- 🇫🇷 (`FR`) France
+### Cluster Mode: Node.js Load Balancing & Zero Downtime Reload
 
-### G
-- 🇬🇪 (`GE`) Georgia
-- 🇬🇫 (`GF`) French Guiana
-- 🇬🇱 (`GL`) Greenland
-- 🇬🇵 (`GP`) Guadeloupe
-- 🇬🇷 (`GR`) Greece
-- 🇬🇹 (`GT`) Guatemala
-- 🇬🇺 (`GU`) Guam
-- 🇬🇼 (`GW`) Guinea-Bissau
+The Cluster mode is a special mode when starting a Node.js application, it starts multiple processes and load-balance HTTP/TCP/UDP queries between them. This increase overall performance (by a factor of x10 on 16 cores machines) and reliability (faster socket re-balancing in case of unhandled errors).
 
-### H
-- 🇭🇷 (`HR`) Croatia
-- 🇭🇺 (`HU`) Hungary
+![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/cluster.png)
 
-### I
-- 🇮🇨 (`IC`) Canary Islands
-- 🇮🇩 (`ID`) Indonesia
-- 🇮🇪 (`IE`) Ireland
-- 🇮🇱 (`IL`) Israel
-- 🇮🇳 (`IN`) Inde
-- 🇮🇸 (`IS`) Iceland
-- 🇮🇹 (`IT`) Italy
+Starting a Node.js application in cluster mode that will leverage all CPUs available:
 
-### J
-- 🇯🇵 (`JP`) Japan
+```bash
+$ pm2 start api.js -i <processes>
+```
 
-### K
-- 🇰🇪 (`KE`) Kenya
-- 🇰🇬 (`KG`) Kyrgyzstan
-- 🇰🇷 (`KR`) South Korea
-- 🇰🇼 (`KW`) Kuwait
-- 🇰🇿 (`KZ`) Kazakhstan
+`<processes>` can be `'max'`, `-1` (all cpu minus 1) or a specified number of instances to start.
 
-### L
-- 🇱🇮 (`LI`) Liechtenstein
-- 🇱🇹 (`LT`) Lithuania
-- 🇱🇺 (`LU`) Luxembourg
-- 🇱🇻 (`LV`) Latvia
+**Zero Downtime Reload**
 
-### M
-- 🇲🇦 (`MA`) Morocco
-- 🇲🇩 (`MD`) Moldova
-- 🇲🇪 (`ME`) Montenegro
-- 🇲🇬 (`MG`) Madagascar
-- 🇲🇭 (`MH`) Marshall Islands
-- 🇲🇰 (`MK`) North Macedonia
-- 🇲🇲 (`MM`) Myanmar
-- 🇲🇳 (`MN`) Mongolia
-- 🇲🇵 (`MP`) Northern Mariana Islands
-- 🇲🇶 (`MQ`) Martinique
-- 🇲🇹 (`MT`) Malta
-- 🇲🇻 (`MV`) Maldives
-- 🇲🇽 (`MX`) Mexico
-- 🇲🇾 (`MY`) Malaysia
-- 🇲🇿 (`MZ`) Mozambique
+Hot Reload allows to update an application without any downtime:
 
-### N
-- 🇳🇱 (`NL`) Netherlands
-- 🇳🇴 (`NO`) Norway
-- 🇳🇿 (`NZ`) New Zealand
+```bash
+$ pm2 reload all
+```
 
-### P
-- 🇵🇭 (`PH`) Philippines
-- 🇵🇰 (`PK`) Pakistan
-- 🇵🇱 (`PL`) Poland
-- 🇫🇷 (`PM`) Saint Pierre and Miquelon
-- 🇵🇷 (`PR`) Puerto Rico
-- 🇵🇸 (`PS`) Palestine
-- 🇵🇹 (`PT`) Portugal
-- 🇵🇼 (`PW`) Palau
+[More informations about how PM2 make clustering easy](https://pm2.keymetrics.io/docs/usage/cluster-mode/)
 
-### R
-- 🇷🇪 (`RE`) Réunion
-- 🇷🇴 (`RO`) Romania
-- 🇷🇸 (`RS`) Serbia
-- 🇷🇺 (`RU`) Russian Federation
+### Container Support
 
-### S
-- 🇸🇦 (`SA`) Saudi Arabia
-- 🇸🇩 (`SD`) Sudan
-- 🇸🇪 (`SE`) Sweden
-- 🇸🇬 (`SG`) Singapore
-- 🇸🇮 (`SI`) Slovenia
-- 🇸🇰 (`SK`) Slovakia
-- 🇸🇲 (`SM`) San Marino
-- 🇸🇿 (`SZ`) Swaziland
+With the drop-in replacement command for `node`, called `pm2-runtime`, run your Node.js application in a hardened production environment.
+Using it is seamless:
 
-### T
-- 🇹🇭 (`TH`) Thailand
-- 🇹🇯 (`TJ`) Tajikistan
-- 🇹🇲 (`TM`) Turkmenistan
-- 🇹🇳 (`TN`) Tunisia
-- 🇹🇷 (`TR`) Turkey
-- 🇹🇼 (`TW`) Taiwan
+```
+RUN npm install pm2 -g
+CMD [ "pm2-runtime", "npm", "--", "start" ]
+```
 
-### U
-- 🇺🇦 (`UA`) Ukraine
-- 🇬🇧 (`UK`) United Kingdom
-- 🇺🇸 (`US`) United States of America
-- 🇺🇾 (`UY`) Uruguay
-- 🇺🇿 (`UZ`) Uzbekistan
+[Read More about the dedicated integration](https://pm2.keymetrics.io/docs/usage/docker-pm2-nodejs/)
 
-### V
-- 🇻🇪 (`VE`) Venezuela
-- 🇻🇮 (`VI`) Virgin Islands (U.S.)
-- 🇻🇳 (`VN`) Viet Nam
+### Host monitoring speedbar
 
-### X
-- 🇽🇰 (`XK`) Kosovo
+PM2 allows to monitor your host/server vitals with a monitoring speedbar.
 
-### Y
-- (`YU`) Yugoslavia
+To enable host monitoring:
 
-### Z
-- 🇿🇦 (`ZA`) South Africa
-- 🇿🇲 (`ZM`) Zambia
+```bash
+$ pm2 set pm2:sysmonit true
+$ pm2 update
+```
+
+![Framework supported](https://raw.githubusercontent.com/Unitech/PM2/master/pres/vitals.png)
+
+### Terminal Based Monitoring
+
+![Monit](https://github.com/Unitech/pm2/raw/master/pres/pm2-monit.png)
+
+Monitor all processes launched straight from the command line:
+
+```bash
+$ pm2 monit
+```
+
+### Log Management
+
+To consult logs just type the command:
+
+```bash
+$ pm2 logs
+```
+
+Standard, Raw, JSON and formated output are available.
+
+Examples:
+
+```bash
+$ pm2 logs APP-NAME       # Display APP-NAME logs
+$ pm2 logs --json         # JSON output
+$ pm2 logs --format       # Formated output
+
+$ pm2 flush               # Flush all logs
+$ pm2 reloadLogs          # Reload all logs
+```
+
+To enable log rotation install the following module
+
+```bash
+$ pm2 install pm2-logrotate
+```
+
+[More about log management](https://pm2.keymetrics.io/docs/usage/log-management/)
+
+### Startup Scripts Generation
+
+PM2 can generate and configure a Startup Script to keep PM2 and your processes alive at every server restart.
+
+Init Systems Supported: **systemd**, **upstart**, **launchd**, **rc.d**
+
+```bash
+# Generate Startup Script
+$ pm2 startup
+
+# Freeze your process list across server restart
+$ pm2 save
+
+# Remove Startup Script
+$ pm2 unstartup
+```
+
+[More about Startup Scripts Generation](https://pm2.keymetrics.io/docs/usage/startup/)
+
+### Updating PM2
+
+```bash
+# Install latest PM2 version
+$ npm install pm2@latest -g
+# Save process list, exit old PM2 & restore all processes
+$ pm2 update
+```
+
+*PM2 updates are seamless*
+
+## PM2+ Monitoring
+
+If you manage your apps with PM2, PM2+ makes it easy to monitor and manage apps across servers.
+
+![https://app.pm2.io/](https://pm2.io/img/app-overview.png)
+
+Feel free to try it:
+
+[Discover the monitoring dashboard for PM2](https://app.pm2.io/)
+
+Thanks in advance and we hope that you like PM2!
+
+## CHANGELOG
+
+[CHANGELOG](https://github.com/Unitech/PM2/blob/master/CHANGELOG.md)
+
+## Contributors
+
+[Contributors](http://pm2.keymetrics.io/hall-of-fame/)
+
+## License
+
+PM2 is made available under the terms of the GNU Affero General Public License 3.0 (AGPL 3.0).
+For other licenses [contact us](mailto:contact@keymetrics.io).
