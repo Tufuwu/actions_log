@@ -1,39 +1,40 @@
-name: CI
+name: drf-tus
 
 on:
   push:
-    branches:
-    - main
   pull_request:
-
-concurrency:
-  group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
+    branches:
+    - 'master'
+    paths-ignore:
+    - 'docs/*'
+    - 'example/*'
+    - 'README.rst'
+    - 'CONTRIBUTING.rst'
+    - 'HISTORY.rst'
+    - '.coverage'
+    - '.editorconfig'
+    - '.gitignore'
+    - '.pre-commit-config.yaml'
+    - 'LICENSE'
+    - 'Makefile'
+    - 'MANIFEST.in'
 
 jobs:
-  tests:
-    name: Python ${{ matrix.python-version }}
-    runs-on: ubuntu-24.04
-
+  build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version:
-        - 3.9
-        - '3.10'
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v3
-
-    - uses: actions/setup-python@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-        cache: pip
-        cache-dependency-path: 'requirements_dev.txt'
-
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install --upgrade tox tox-py
-
-    - name: Run tox targets for ${{ matrix.python-version }}
-      run: tox --py current
+        python -m pip install --upgrade pip
+        python -m pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox
