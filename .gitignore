@@ -1,13 +1,10 @@
-# example checkpoints
-irrad_spectroscopy/examples/.ipynb_checkpoints/
-# example output folder
-irrad_spectroscopy/examples/output/
-# pyc
-*.pyc
-# pycharm
+logs
+*.log
+npm-debug.log*
+node_modules/
 .idea/
-# eclipse
-.project
-.pydevproject
-# egg-info folder
-irrad_spectroscopy.egg-info/
+*.code-workspace
+.nyc_output/
+coverage/
+coverage.lcov
+*.iml
