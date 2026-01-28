@@ -1,64 +1,104 @@
-# Intercept Redirect
+# Codemeta Generator
 
-[![Intercept Redirect Logo](https://raw.githubusercontent.com/bjornstar/intercept-redirect/master/assets/icon-300.png)](https://intercept-redirect.bjornstar.com)
+This repository contains a (client-side) web application to generate
+CodeMeta documents (aka. `codemeta.json`).
 
-[![Travis CI](https://travis-ci.org/bjornstar/intercept-redirect.svg?branch=master)](https://travis-ci.org/bjornstar/intercept-redirect)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/9qrj76bt914531gg/branch/master?svg=true)](https://ci.appveyor.com/project/bjornstar/intercept-redirect/branch/master)
-[![CircleCI](https://circleci.com/gh/bjornstar/intercept-redirect/tree/master.svg?style=svg)](https://circleci.com/gh/bjornstar/intercept-redirect/tree/master)
+The [CodeMeta initiative](https://github.com/codemeta/codemeta) is a Free and Open Source academic collaboration
+creating a minimal metadata schema for research software and code.
 
-[![AMO Badge](https://img.shields.io/amo/v/intercept-redirect)](https://intercept-redirect.firefox.bjornstar.com)
-[![CWS Badge](https://img.shields.io/chrome-web-store/v/kdjmiebhgaleboaamnehjbamlghkoedf)](https://intercept-redirect.chrome.bjornstar.com)
+The academic community recommands on adding a codemeta.json file in
+the root directory of your repository.
 
-Skip tracking redirects that serve no purpose other than to waste your valuable time.
+With this linked data metadata file, you can easily declare the authorship,
+include contextual information and link to other research outputs (publications,
+data, etc.).
 
-This extension does not modify any of the pages that you visit. Its sole purpose is to intercept network requests intended for redirect services. It requests the bare minimum of access to these domains to protect your privacy and have the best performance.
+Also, the `codemeta.json` file in your source code is indexed in the
+Software Heritage (SWH) archive, which will improve findability in searches.
 
-## Supported Domains
-- c212.net
-- *.curseforge.com
-- clickserve.dartsearch.net
-- github-redirect.dependabot.com
-- *.digidip.net
-- disq.us
-- cj.dotomi.com
-- console.ebsta.com
-- redirect.epicgames.com
-- exit.sc
-- facebook.com
-- l.facebook.com
-- lm.facebook.com
-- m.facebook.com
-- gate.sc
-- www.google.co.jp
-- news.url.google.com
-- plus.url.google.com
-- www.google.com
-- www.google.se
-- www.googleadservices.com
-- href.li
-- l.instagram.com
-- www.javlibrary.com
-- r.klar.na
-- www.kraken.com
-- t.lever-analytics.com
-- www.linkedin.com
-- l.messenger.com
-- outgoing.prod.mozaws.net
-- onlyfans.com
-- *.safelinks.protection.outlook.com
-- slack-redir.net
-- steamcommunity.com
-- twitter.com
-- t.umblr.com
-- vk.com
-- workable.com
-- www.youtube.com
+### References
 
-## Installation
+- [SWH guidelines](https://www.softwareheritage.org/save-and-reference-research-software/) for research software.
 
-Intercept Redirect is available for the following browsers:
+- [SWH blog post](https://www.softwareheritage.org/2019/05/28/mining-software-metadata-for-80-m-projects-and-even-more/) about metadata indexation.
+- [Dan S. Katz's blog post](https://danielskatzblog.wordpress.com/2017/09/25/software-heritage-and-repository-metadata-a-software-citation-solution/) about including
+ metadata in your repository.
+- FORCE11's Software Citation Implementation WG [repository](https://github.com/force11/force11-sciwg)
+- RDA & FORCE11's joint Software Source Code Identification WG
+   [repository](https://github.com/force11/force11-rda-scidwg)
 
-- Mozilla Firefox - https://intercept-redirect.firefox.bjornstar.com
-- Microsoft Edge - https://intercept-redirect.edge.bjornstar.com
-- Opera - https://intercept-redirect.opera.bjornstar.com
-- Google Chrome - https://intercept-redirect.chrome.bjornstar.com
+## Specifications
+
+### Use case
+
+1. create a complete codemeta.json file from scratch
+2. aggregate existing information and add complementary information to
+a codemeta.json file
+
+### Functionalities
+
+- helpers while completing the form, for example a reference list of spdx
+  licenses
+- a validation mechanism after submission
+- the possibility to use all the codeMeta terms and schema.org terms
+- accessible from multiple platforms (web browsers or OS)
+- (extra) the possibility to correct the output after validation as part
+  of the creation process
+
+This tool was initially prepared for the [FORCE19 Hackathon](https://github.com/force11/force11-rda-scidwg/tree/master/hackathon/FORCE2019).
+
+
+## Code contributions.
+
+This section only applies to developers who want to contribute to the Codemeta Generator.
+If you only want to use it, you can use
+[the hosted version](https://codemeta.github.io/codemeta-generator/) instead.
+
+### Code guidelines
+
+This application is designed to work on popular modern browsers (Firefox,
+Chromium/Google Chrome, Edge, Safari). Check [Caniuse](https://caniuse.com/)
+for availability of features for these browsers.
+
+To keep the architecture simple, we serve javascript files directly to
+browsers, without a compiler or transpiler; and do not use third-party
+dependencies for now.
+
+### Running local changes
+
+To run Codemeta Generator, you just need an HTTP server serving the
+files (nginx, apache2, etc.).
+
+The simplest way is probably to use Python's HTTP server:
+
+```
+git clone https://github.com/codemeta/codemeta-generator
+cd codemeta-generator
+python3 -m http.server
+```
+
+then open [http://localhost:8000/](http://localhost:8000/) in your web browser.
+
+### Automatic testing
+
+In addition to manual testing, we have automated tests to check for bugs
+quickly, using [Cypress](https://www.cypress.io/).
+
+To run them, first install Cypress:
+
+```
+sudo apt install npm  # or the equivalent on your system
+npm install cypress
+$(npm bin)/cypress install
+```
+
+Then, run the tests:
+
+```
+$(npm bin)/cypress run
+```
+
+
+## Contributed by
+
+![Image description](https://annex.softwareheritage.org/public/logo/software-heritage-logo-title-motto.svg)
