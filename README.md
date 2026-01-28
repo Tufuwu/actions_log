@@ -1,171 +1,92 @@
-OpenSSH / LDAP public keys
-==========================
-[![Build Status](https://github.com/jirutka/ssh-ldap-pubkey/workflows/CI/badge.svg)](https://github.com/jirutka/ssh-ldap-pubkey/actions?query=workflow%3A%22CI%22)
-[![Code Climate](https://codeclimate.com/github/jirutka/ssh-ldap-pubkey/badges/gpa.svg)](https://codeclimate.com/github/jirutka/ssh-ldap-pubkey)
-[![version](https://img.shields.io/pypi/v/ssh-ldap-pubkey.svg?style=flat)](https://pypi.python.org/pypi/ssh-ldap-pubkey)
+[![CI](https://github.com/jneight/django-earthdistance/actions/workflows/ci.yml/badge.svg)](https://github.com/jneight/django-earthdistance/actions/workflows/ci.yml)
 
-This project provides an utility to manage SSH public keys stored in LDAP and also a script for
-OpenSSH server to load authorized keys from LDAP.
+[![pypi version](https://img.shields.io/pypi/v/django-earthdistance.svg)](https://pypi.python.org/pypi/django-earthdistance)
 
+[![pypi license](http://img.shields.io/pypi/l/django-earthdistances.svg)](https://pypi.python.org/pypi/django-earthdistance)
 
-Why?
-----
+django-earthdistance
+====================
 
-When you have dozen of servers it becomes difficult to manage your authorized keys. You have to
-copy all your public keys to `~/.ssh/authorized_keys` on every server you want to login to. And
-what if you someday change your keys?
+Using PostgreSQL\'s EarthDistance extension for django 1.11, 2.2 and 3.2
+(for older versions see *with\_djorm\_expressions* branch)
 
-It’s a good practice to use some kind of a centralized user management, usually an LDAP server.
-There you have user’s login, uid, e-mail, … and password. What if we could also store public SSH
-keys on LDAP server? With this utility it’s easy as pie.
-
-
-Alternatives
-------------
-
-If you need just a lightweight utility for OpenSSH server to load authorized keys from LDAP,
-then you can use [ssh-getkey-ldap](https://github.com/jirutka/ssh-getkey-ldap) written in Lua
-or [this one](https://gist.github.com/jirutka/b15c31b2739a4f3eab63) written in POSIX shell
-(but it requires `ldapsearch` utility and may not work well on some systems).
-
-
-Requirements
-------------
-
-* Python 3.6+
-* [python-ldap] 3.x
-* [docopt] 0.6.x
-
-You can install both Python modules from PyPI.
-python-ldap requires additional system dependencies – OpenLDAP.
-Refer to [Stack Overflow](http://stackoverflow.com/q/4768446/240963) for distribution-specific information.
-
-
-Installation
-------------
-
-### PyPI:
-
-    pip install ssh-ldap-pubkey
-
-### Alpine Linux
-
-    apk add ssh-ldap-pubkey
-
-Note: The package is currently in the (official) _community_ repository; make sure that you have community in `/etc/apk/repositories`.
-
+Earthdistance allows to do fast geolocalized queries without using
+PostGIS
 
 Usage
 -----
 
-List SSH public keys stored in LDAP for the current user:
+Cube and EarthDistance extensions must be enabled in postgreSQL BD, so
+log in database using pgsql and install extensions:
 
-    ssh-ldap-pubkey list
+``` {.sql}
+=> create extension cube;
+=> create extension earthdistance;
+```
 
-List SSH public keys stored in LDAP for the specified user:
+Filter by rows inside a circunference of radius r
+-------------------------------------------------
 
-    ssh-ldap-pubkey list -u flynn
+``` {.python}
+from django.db import models
 
-Add the specified SSH public key for the current user to LDAP:
+from django_earthdistance.models import EarthDistanceQuerySet
 
-    ssh-ldap-pubkey add ~/.ssh/id_rsa.pub
+class MyModel(models.Model):
+    latitude = models.FloatField()
+    longitude = models.FloatField()
 
-Remove SSH public key(s) of the current user that matches the specified pattern:
+    objects = EarthDistanceQuerySet.as_manager()
 
-    ssh-ldap-pubkey del flynn@grid
+# Define fields to query in DistanceExpression initialization
+# search with lat=0.2546 and lon=-38.25 and distance 1500 meters
+# use param `annotate` to set a custom field for the distance, `_ed_distance` as default
 
-Specify LDAP URI and base DN on command line instead of configuration file:
+MyModel.objects.in_distance(1500, fields=['latitude', 'longitude'], points=[0.2546, -38.25])
+```
 
-    ssh-ldap-pubkey list -b ou=People,dc=encom,dc=com -H ldaps://encom.com -u flynn
+Annotate each row returned by a query with distance between two points
+----------------------------------------------------------------------
 
-As the LDAP manager, add SSH public key to LDAP for the specified user:
+``` {.python}
+from django_earthdistance.models import EarthDistance, LlToEarth
 
-    ssh-ldap-pubkey add -D cn=Manager,dc=encom,dc=com -u flynn ~/.ssh/id_rsa.pub
+MyModel.objects.filter(....).annotate(
+    distance=EarthDistance([
+        LlToEarth([0.2546, -38.25]),
+        LlToEarth(['latitude', 'longitude'])
+    ]))
+```
 
-Show help for other options:
+Optimizing perfomance with indexes
+----------------------------------
 
-    ssh-ldap-pubkey --help
+PostgreSQL allow to use GiST indexes with functions results, a good
+perfomance improvement is to store [ll\_to\_earth]{.title-ref} results
+in an index, [ll\_to\_earth]{.title-ref} is a function that calculates
+the position of a point on the surface of the earth (assuming earth is
+perfectly spherical)
 
+``` {.sql}
+-- Example MyModel table is app_mymodel and points columns are latitude and longitude
+CREATE INDEX mymodel_location ON app_mymodel USING gist (ll_to_earth(latitude, longitude));
+```
 
-Configuration
--------------
+### For django \< 1.7
 
-Configuration is read from /etc/ldap.conf — file used by LDAP nameservice switch library and the
-LDAP PAM module. An example file is included in [etc/ldap.conf][ldap.conf]. The following subset of
-parameters are used:
+Also, using south is preferred, just add this migration to migrations/
+folder and edit it to your needs, index will be created
 
-*  **uri** ... URI(s) of the LDAP server(s) to connect to, separated by a space. The URI scheme may
-               be ldap, or ldaps. Default is `ldap://localhost`.
-*  **nss_base_passwd** ... distinguished name (DN) of the search base.
-*  **base** ... distinguished name (DN) of the search base. Used when *nss_base_passwd* is not set.
-*  **scope** ... search scope; _sub_, _one_, or _base_ (default is _sub_).
-*  **referrals** ... should client automatically follow referrals returned by LDAP servers (default is _on_)?
-*  **pam_filter** ... filter to use when searching for the user’s entry, additional to the login
-        attribute value assertion (`pam_login_attribute=<login>`). Default is
-        _objectclass=posixAccount_.
-*  **pam_login_attribute** ... the user ID attribute (default is _uid_).
-*  **ldap_version** ... LDAP version to use (default is 3).
-*  **sasl** ... enable SASL and specify mechanism to use (currently only GSSAPI is supported).
-*  **binddn** ... distinguished name (DN) to bind when reading the user’s entry (default is to bind
-                  anonymously).
-*  **bindpw** ... credentials to bind with when reading the user’s entry (default is none).
-*  **ssl** ... LDAP SSL/TLS method; _off_, _on_, or _start_tls_. If you use LDAP over SSL (i.e. URI `ldaps://`), leave this empty.
-*  **timelimit** ... search time limit in seconds (default is 10).
-*  **bind_timelimit** ... bind/connect time limit in seconds (default is 10). If multiple URIs are
-                          specified in _uri_, then the next one is tried after this timeout.
-*  **tls_cacertdir** ... path of the directory with CA certificates for LDAP server certificate
-                         verification.
-*  **pubkey_class** ... objectClass that should be added/removed to/from the user’s entry when adding/removing first/last public key and the *pubkey_attr* is mandatory for this class.
-   This is needed for the original openssh-lpk.schema (not for the one in this repository).
-   Default is `ldapPublicKey`.
-*  **pubkey_attr** ... name of LDAP attribute used for SSH public keys (default is `sshPublicKey`).
+``` {.python}
+class Migration(SchemaMigration):
 
-The only required parameter is *nss_base_passwd* or _base_, others have sensitive defaults. You
-might want to define _uri_ parameter as well. These parameters can be also defined/overriden
-with `--bind` and `--uri` options on command line.
-
-For more information about these parameters refer to ldap.conf man page.
-
-
-Set up OpenSSH server
---------------------
-
-To configure OpenSSH server to fetch users’ authorized keys from LDAP server:
-
-1.  Make sure that you have installed **ssh-ldap-pubkey** and **ssh-ldap-pubkey-wrapper** in
-    `/usr/bin` with owner `root` and mode `0755`.
-2.  Add these two lines to /etc/ssh/sshd_config:
-
-        AuthorizedKeysCommand /usr/bin/ssh-ldap-pubkey-wrapper
-        AuthorizedKeysCommandUser nobody
-
-3.  Restart sshd and check log file if there’s no problem.
-
-Note: This method is supported by OpenSSH since version 6.2-p1 (or 5.3 onRedHat). If you have an
-older version and can’t upgrade, for whatever weird reason, use [openssh-lpk] patch instead.
+    def forwards(self, orm):
+        cursor = connection.cursor()
+        cursor.execute("CREATE INDEX mymodel_location ON app_mymodel USING gist (ll_to_earth(latitude, longitude));")
 
 
-Set up LDAP server
-------------------
-
-Just add the [openssh-lpk.schema] to your LDAP server, **or** add an attribute named `sshPublicKey`
-to any existing schema which is already defined in people entries. That’s all.
-
-Note: Presumably, you’ve already set up your LDAP server for centralized unix users management,
-i.e. you have the [NIS schema](http://www.zytrax.com/books/ldap/ape/nis.html) and users in LDAP.
-
-
-License
--------
-
-This project is licensed under [MIT license](http://opensource.org/licenses/MIT).
-
-
-[python-ldap]: https://pypi.python.org/pypi/python-ldap/
-[docopt]: https://pypi.python.org/pypi/docopt/
-[ebuild]: https://github.com/cvut/gentoo-overlay/tree/master/sys-auth/ssh-ldap-pubkey
-[cvut-overlay]: https://github.com/cvut/gentoo-overlay
-[openssh-lpk]: http://code.google.com/p/openssh-lpk/
-
-[ldap.conf]: https://github.com/jirutka/ssh-ldap-pubkey/blob/master/etc/ldap.conf
-[openssh-lpk.schema]: https://github.com/jirutka/ssh-ldap-pubkey/blob/master/etc/openssh-lpk.schema
+    def backwards(self, orm):
+        # Deleting field 'Venue.coords'
+        cursor = connection.cursor()
+        cursor.execute("DROP INDEX mymodel_location ON app_mymodel;")
+```

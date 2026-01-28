@@ -1,60 +1,52 @@
 name: CI
-on:
-  - push
-  - pull_request
-
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
-  test:
-    name: Test on Python ${{ matrix.python }}
-    runs-on: ubuntu-latest
+  build:
+    env:
+      POSTGRES_USER: postgres
+      PGPASSWORD: postgres
+    runs-on: '${{ matrix.os }}'
     strategy:
-      fail-fast: false
       matrix:
-        python:
-          - '3.8'
-          - '3.9'
-          - '3.10'
+        include:
+          - os: ubuntu-latest
+            python-version: '3.8'
+            django-version: '3.2.23'
+          - os: ubuntu-latest
+            python-version: '3.9'
+            django-version: '3.2.23'
+          - os: ubuntu-latest
+            python-version: '3.10'
+            django-version: '3.2.23'
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Python ${{ matrix.python }}
-        uses: actions/setup-python@v3
+      - name: 'Set up Python ${{ matrix.python-version }}'
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install system dependencies
-        run: |
-          sudo apt update -qq
-          sudo apt install -q libldap-dev libsasl2-dev
-
-      - name: Install project requirements
-        run: |
-          pip install -U -r requirements.txt
-          python3 setup.py install
-
-      - name: Run tests
-        run: py.test --cov=ssh_ldap_pubkey --cov-report term -vv
-
-      - name: Run linter
-        run: pycodestyle
-
-  publish:
-    name: Publish to PyPI
-    if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-python@v3
-        with:
-          python-version: '3.10'
-
-      - name: Build source tarball
-        run: python3 setup.py sdist
-
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          python-version: '${{ matrix.python-version }}'
+      - uses: actions/checkout@v4
+      - run: pip install --upgrade pip
+      - run: pip install django==${{ matrix.django-version}}
+      - run: pip install psycopg2
+      - run: psql -d template1 -c 'create extension cube;' -U $POSTGRES_USER -h localhost
+      - run: psql -d template1 -c 'create extension earthdistance;' -U $POSTGRES_USER -h localhost
+      - run: python setup.py -q install
+      - run: python runtests.py

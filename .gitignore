@@ -1,17 +1,6 @@
-# Byte-compiled / optimized files
-__pycache__/
-*.py[cod]
-
-# Distribution / packaging
-env/
+*.log
+*.pot
+*.pyc
 build/
 dist/
-/MANIFEST
-*.egg-info/
-*.egg
-
-# pytest
-.cache/
-
-# Coverage report
-.coverage
+django_earthdistance.egg-info/
