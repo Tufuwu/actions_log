@@ -1,3 +1,5 @@
-/*.tgz
-dist
+*.zip
 node_modules
+package-lock.json
+reports
+.DS_Store

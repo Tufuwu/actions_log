@@ -1,2 +1,7 @@
-.idea
-node_modules
+.appveyor.yml
+.circleci
+.eslintrc.json
+.github
+.travis.yml
+assets
+build
