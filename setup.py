@@ -1,26 +1,32 @@
-#!/usr/bin/env python3
+from pathlib import Path
+from setuptools import setup
 
-import setuptools
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
-setuptools.setup(
-    name="pyteal",
-    version="0.9.1",
-    author="Algorand",
-    author_email="pypiservice@algorand.com",
-    description="Algorand Smart Contracts in Python",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/algorand/pyteal",
-    packages=setuptools.find_packages(),
-    install_requires=["py-algorand-sdk"],
+setup(
+    author="Eduardo Cuducos",
+    author_email="cuducos@gmail.com",
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "Development Status :: 4 - Beta",
+        "Environment :: Web Environment",
+        "Framework :: Django",
+        "Framework :: Flask",
+        "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
-    package_data={"pyteal": ["*.pyi"]},
-    python_requires=">=3.6",
+    description="Elm filter for webassets",
+    install_requires=["webassets"],
+    keywords=["elm", "webassets", "assets", "django", "flask"],
+    license="MIT",
+    long_description=Path("README.rst").read_text(),
+    name="webassets-elm",
+    py_modules=["webassets_elm"],
+    python_requires=">=3.5",
+    test_suite="nose.collector",
+    tests_require=["nose"],
+    url="https://github.com/cuducos/webassets-elm",
+    version="0.2.1",
+    zip_safe=False,
 )
