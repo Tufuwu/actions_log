@@ -1,6 +1,1 @@
-test
-tmp
-tmp2
-coverage
-.vscode
-.nyc_output
+.idea

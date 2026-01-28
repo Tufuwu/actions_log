@@ -1,5 +1,6 @@
+.idea
+.DS_Store
 node_modules
-coverage
-.nyc_output
-tmp
-tmp2
+cache
+build
+lib/modernizr-dev.js
